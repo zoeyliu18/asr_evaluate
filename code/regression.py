@@ -157,10 +157,14 @@ if __name__ == '__main__':
 
 	if args.state == 'g':
 		for lang_dir in os.listdir(args.input):
-			if lang_dir in ['fongbe', 'iban']: #'wolof', 'iban',
+			if lang_dir in ['iban']: #'wolof', 'iban',
 				regression_data = []
 
-				if 'utterance_features.txt' not in 'data/' + lang_dir + '/':
+				header = ['File', 'Path', 'Transcript', 'Duration', 'Pitch', 'Intensity', 'PPL', 'Num_word', 'Word_type', 'OOV', 'Train_Duration', 'Train_Pitch', 'Train_Intensity', 'Train_PPL', 'Train_Num_word', 'Train_Word_type', 'Train_OOV', 'Duration_ratio', 'Pitch_ratio', 'Intensity_ratio', 'PPL_ratio', 'Num_word_ratio', 'Word_type_ratio', 'OOV_ratio', 'WER', 'MER', 'WIL', 'Evaluation', 'Lang']
+				regression_file = open('data/' + lang_dir + '/' + lang_dir + '_regression.txt', 'w')
+				regression_file.write('\t'.join(w for w in header) + '\n')
+
+				if 'utterance_features.txt' not in os.listdir('data/' + lang_dir + '/'):
 					all_features = gather_features('data/' + lang_dir + '/audio_info.txt', 'data/' + lang_dir + '/' + lang_dir + '_lm_info.txt', 'data/' + lang_dir + '/local/corpus.txt', 'data/' + lang_dir + '/')
 
 				corpus_data = read_corpus('data/' + lang_dir + '/local/corpus.txt')
@@ -189,11 +193,13 @@ if __name__ == '__main__':
 						train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov = gather_train_features('data/' + lang_dir + '/' + evaluate_dir + '/train' + index + '/text', corpus_data)
 
 						wers = []
+						evaluations = []
 
 						with io.open(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/RESULTS', encoding = 'utf-8') as f:
 							for line in f:
 								toks = line.split()
 								wers.append(toks[1])
+								evaluations.append(toks)
 
 						min_wer = min(wers)
 						min_wer_idx = wers.index(min_wer)
@@ -240,14 +246,114 @@ if __name__ == '__main__':
 										info.append(evaluate_dir)
 										info.append(lang_dir)
 
-										regression_data.append(info)
+									#	regression_data.append(info)
+										regression_file.write('\t'.join(str(w) for w in info))
 								except:
 									pass
 
-				header = ['File', 'Path', 'Transcript', 'Duration', 'Pitch', 'Intensity', 'PPL', 'Num_word', 'Word_type', 'OOV', 'Train_Duration', 'Train_Pitch', 'Train_Intensity', 'Train_PPL', 'Train_Num_word', 'Train_Word_type', 'Train_OOV', 'Duration_ratio', 'Pitch_ratio', 'Intensity_ratio', 'PPL_ratio', 'Num_word_ratio', 'Word_type_ratio', 'OOV_ratio', 'WER', 'MER', 'WIL', 'Evaluation', 'Lang']
+		#		header = ['File', 'Path', 'Transcript', 'Duration', 'Pitch', 'Intensity', 'PPL', 'Num_word', 'Word_type', 'OOV', 'Train_Duration', 'Train_Pitch', 'Train_Intensity', 'Train_PPL', 'Train_Num_word', 'Train_Word_type', 'Train_OOV', 'Duration_ratio', 'Pitch_ratio', 'Intensity_ratio', 'PPL_ratio', 'Num_word_ratio', 'Word_type_ratio', 'OOV_ratio', 'WER', 'MER', 'WIL', 'Evaluation', 'Lang']
 
-				with io.open('data/' + lang_dir + '/regression.txt', 'w') as f:
-					f.write('\t'.join(w for w in header) + '\n')
+		#		with io.open('data/' + lang_dir + '/' + lang_dir + '_regression.txt', 'w') as f:
+		#			f.write('\t'.join(w for w in header) + '\n')
 
-					for tok in regression_data:
-						f.write('\t'.join(str(w for w in tok)) + '\n')
+		#			for tok in regression_data:
+		#				f.write('\t'.join(str(w for w in tok)) + '\n')
+'''
+			if lang_dir in ['hupa']:
+				for quality in ['top_tier', 'second_tier']:
+					regression_data = []
+
+					if 'utterance_features.txt' not in os.listdir('data/' + lang_dir + '/' + quality + '/'):
+						all_features = gather_features('data/' + lang_dir + '/' + quality + '/' + '/audio_info.txt', 'data/' + lang_dir + '/' + quality + '/' + lang_dir + '_lm_info.txt', 'data/' + lang_dir + '/local/hupa_texts.txt', 'data/' + lang_dir + '/' + quality + '/')
+
+					corpus_data = read_corpus('data/' + lang_dir + '/local/hupa_texts.txt')
+
+					data = pd.read_csv('data/' + lang_dir + '/' + quality + '/utterance_features.txt', sep = '\t')
+					audio_list = data['File'].tolist()
+					directory_list = data['Path'].tolist()
+					transcript_list = data['Transcript'].tolist()
+					duration_list = data['Duration'].tolist()
+					pitch_list = data['Pitch'].tolist()
+					intensity_list = data['Intensity'].tolist()
+					ppl_list = data['PPL'].tolist()
+					num_word_list = data['Num_word'].tolist()
+					word_type_list = data['Word_type'].tolist()
+					oov_list = data['OOV'].tolist()
+
+					all_features = {}
+					for i in range(len(audio_list)):
+						all_features[audio_list[i]] = [directory_list[i], transcript_list[i], duration_list[i], pitch_list[i], intensity_list[i], ppl_list[i], num_word_list[i], word_type_list[i], oov_list[i]]
+
+					for evaluate_dir in os.listdir(args.input + lang_dir + '/' + quality + '/'):
+						for output_dir in os.listdir(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/'):
+
+							index = output_dir[6 : ]
+
+							train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov = gather_train_features('data/' + lang_dir + '/' + quality + '/' + evaluate_dir + '/train' + index + '/text', corpus_data)
+
+							wers = []
+							evaluations = []
+
+							with io.open(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/RESULTS', encoding = 'utf-8') as f:
+								for line in f:
+									toks = line.split()
+									wers.append(toks[1])
+									evaluations.append(toks)
+
+							min_wer = min(wers)
+							min_wer_idx = wers.index(min_wer)
+
+							best_d = evaluations[min_wer_idx][-1].split('/')[: -1]
+							best_d = '/'.join(w for w in best_d)
+
+							pred_dict = {}
+
+							with io.open(best_d + '/log/decode.1.log', encoding = 'utf-8') as f:
+								for line in f:
+									try:
+										utterance = line.strip().split()
+										if utterance[0] in all_features:
+											ground_truth = all_features[utterance[0]][1]
+											hypothesis = ' '.join(w for w in utterance[1 : ])
+											measures = jiwer.compute_measures(ground_truth, hypothesis)
+											wer = measures['wer']
+											mer = measures['mer']
+											wil = measures['wil']
+
+											info = all_features[utterance[0]]
+
+											info.append(train_ave_duration)
+											info.append(train_ave_pitch)
+											info.append(train_ave_intensity)
+											info.append(train_ave_ppl)
+											info.append(train_ave_num_word)
+											info.append(train_ave_word_type)
+											info.append(train_oov)
+
+											info.append(info[3] / train_ave_duration)
+											info.append(info[4] / train_ave_pitch)
+											info.append(info[5] / train_ave_intensity)
+											info.append(info[6] / train_ave_ppl)
+											info.append(info[7] / train_ave_num_word)
+											info.append(info[8] / train_ave_word_type)
+											info.append(info[9] / train_oov)
+
+											info.append(wer)
+											info.append(mer)
+											info.append(wil)
+											info.append(output_dir)
+											info.append(evaluate_dir)
+											info.append(lang_dir)
+
+											regression_data.append(info)
+									except:
+										pass
+
+					header = ['File', 'Path', 'Transcript', 'Duration', 'Pitch', 'Intensity', 'PPL', 'Num_word', 'Word_type', 'OOV', 'Train_Duration', 'Train_Pitch', 'Train_Intensity', 'Train_PPL', 'Train_Num_word', 'Train_Word_type', 'Train_OOV', 'Duration_ratio', 'Pitch_ratio', 'Intensity_ratio', 'PPL_ratio', 'Num_word_ratio', 'Word_type_ratio', 'OOV_ratio', 'WER', 'MER', 'WIL', 'Evaluation', 'Lang']
+
+					with io.open('data/' + lang_dir + '/' + quality + '/' + lang_dir + '_' + quality + '_regression.txt', 'w') as f:
+						f.write('\t'.join(w for w in header) + '\n')
+
+						for tok in regression_data:
+							f.write('\t'.join(str(w for w in tok)) + '\n')
+'''

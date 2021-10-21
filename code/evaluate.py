@@ -161,10 +161,6 @@ if __name__ == '__main__':
 											except:
 												pass
 
-								#	with io.open(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/cer_RESULTS', 'w', encoding = 'utf-8') as f:
-								#		f.write('CER: ' + str(round(wer(gold, pred) * 100 / 2)) + '\n')
-								#		f.write('CER word level: ' + str(round(wer(gold_word, pred_word) * 100 / 2)) + '\n')
-
 	if args.state == 'a':
 		for lang_dir in os.listdir(args.input):
 			if lang_dir in ['fongbe', 'swahili', 'wolof', 'iban']:
@@ -228,14 +224,3 @@ if __name__ == '__main__':
 								print(lang_dir + '\t' + quality + '\t' + evaluate_dir + '\t' + str(round(statistics.mean(all_wers), 2)) + '\t' + str(len(all_wers)) + '\t' + str(round(statistics.stdev(all_wers), 2)) + '\t' +  str(round(max(all_wers) - min(all_wers), 2)))
 							else:
 								print(lang_dir + '\t' + quality + '\t' + evaluate_dir + '\t' + str(round(statistics.mean(all_wers), 2)) + '\t' + str(len(all_wers)))
-
-	#		with io.open(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/cer_RESULTS', encoding = 'utf-8') as f:
-	#			for line in f:
-	#				if line.startswith('CER: '):
-	#					toks = line.split()
-	#					cers.append(float(toks[1]))
-
-	#		all_cers.append(min(cers))
-
-
-	#	print(statistics.mean(all_cers))
