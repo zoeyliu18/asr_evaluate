@@ -12,10 +12,10 @@ if __name__ == '__main__':
 
 	if args.state == 'c':
 		for lang_dir in os.listdir(args.input):
-			if lang_dir in ['fongbe', 'swahili']: #'wolof', 'iban',
+			if lang_dir in ['fongbe', 'swahili', 'wolof', 'iban']:
 				for evaluate_dir in os.listdir(args.input + lang_dir + '/'):
 					for output_dir in os.listdir(args.input + lang_dir + '/' + evaluate_dir + '/'):
-						if 'RESULTS' not in os.listdir(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/'):
+						if 'RESULTS' not in os.listdir(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/') or os.stat(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/RESULTS').st_size == 0:
 							index = output_dir[6 : ]
 
 							gold_dict = {}
@@ -40,7 +40,7 @@ if __name__ == '__main__':
 							wers = []
 							evaluations = []
 
-							if 'RESULTS' in os.listdir(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/'):
+							if 'RESULTS' in os.listdir(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/') and os.stat(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/RESULTS').st_size != 0:
 								with io.open(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/RESULTS', encoding = 'utf-8') as f:
 									for line in f:
 										toks = line.split()
@@ -92,7 +92,7 @@ if __name__ == '__main__':
 				for quality in ['top_tier', 'second_tier']:
 					for evaluate_dir in os.listdir(args.input + lang_dir + '/' + quality + '/'):
 						for output_dir in os.listdir(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/'):
-							if 'RESULTS' not in os.listdir(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/'):
+							if 'RESULTS' not in os.listdir(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/') or os.stat(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/RESULTS').st_size == 0:
 								index = output_dir[6 : ]
 
 								gold_dict = {}
@@ -117,7 +117,7 @@ if __name__ == '__main__':
 								wers = []
 								evaluations = []
 
-								if 'RESULTS' in os.listdir(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/'):
+								if 'RESULTS' in os.listdir(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/') and os.stat(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/RESULTS').st_size != 0:
 									with io.open(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/RESULTS', encoding = 'utf-8') as f:
 										for line in f:
 											toks = line.split()
@@ -164,6 +164,9 @@ if __name__ == '__main__':
 	if args.state == 'a':
 		for lang_dir in os.listdir(args.input):
 			if lang_dir in ['fongbe', 'swahili', 'wolof', 'iban']:
+				all_heldout_wers = {}
+				all_heldout_duration = {}
+
 				for evaluate_dir in os.listdir(args.input + lang_dir + '/'):
 
 					all_wers = []
@@ -185,6 +188,9 @@ if __name__ == '__main__':
 								print(lang_dir + '/' + evaluate_dir + '/' + output_dir + ' Results Not Complete')
 							else:
 								all_wers.append(min(wers))
+
+								if evaluate_dir == 'heldout_speaker':
+									all_heldout_wers[output_dir[6 : ]] = min(wers)
 						else:
 							print(lang_dir + '/' + evaluate_dir + '/' + output_dir + ' No Results')
 
@@ -194,8 +200,25 @@ if __name__ == '__main__':
 						else:
 							print(lang_dir + '\t' + evaluate_dir + '\t' + str(statistics.mean(all_wers)) + '\t' + str(len(all_wers)))
 
+				for k, v in all_heldout_wers.items():
+					dev_duration = 0
+					with io.open('data/' + lang_dir + '/heldout_speaker/dev' + k + '/utt2dur') as f:
+						for line in f:
+							toks = line.strip().split()
+							dev_duration += float(toks[1])
+					all_heldout_duration[k] = dev_duration
+
+				with io.open(lang_dir + '_heldout_eval.txt', 'w') as f:
+					f.write('\t'.join(w for w in ['Language', 'Speaker', 'Duration', 'WER']) + '\n')
+					for k, v in all_heldout_duration.items():
+						info = [lang_dir, k, v, all_heldout_wers[k]]
+						f.write('\t'.join(str(w) for w in info) + '\n')
+
 			if lang_dir in ['hupa']: #'wolof', 'iban',
 				for quality in ['top_tier', 'second_tier']:
+					all_heldout_wers = {}
+					all_heldout_duration = {}
+
 					for evaluate_dir in os.listdir(args.input + lang_dir + '/' + quality + '/'):
 						all_wers = []
 						all_cers = []
@@ -216,6 +239,9 @@ if __name__ == '__main__':
 									print(lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + ' Results Not Complete')
 								else:
 									all_wers.append(min(wers))
+
+									if evaluate_dir == 'dates':
+										all_heldout_wers[output_dir[6 : ]] = min(wers)
 							else:
 								print(lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + ' No Results')
 
@@ -224,3 +250,17 @@ if __name__ == '__main__':
 								print(lang_dir + '\t' + quality + '\t' + evaluate_dir + '\t' + str(round(statistics.mean(all_wers), 2)) + '\t' + str(len(all_wers)) + '\t' + str(round(statistics.stdev(all_wers), 2)) + '\t' +  str(round(max(all_wers) - min(all_wers), 2)))
 							else:
 								print(lang_dir + '\t' + quality + '\t' + evaluate_dir + '\t' + str(round(statistics.mean(all_wers), 2)) + '\t' + str(len(all_wers)))
+
+					for k, v in all_heldout_wers.items():
+						dev_duration = 0
+						with io.open('data/' + lang_dir + '/' + quality + '/dates/dev' + k + '/utt2dur') as f:
+							for line in f:
+								toks = line.strip().split()
+								dev_duration += float(toks[1])
+						all_heldout_duration[k] = dev_duration
+
+					with io.open(lang_dir + '_' + quality + '_heldout_eval.txt', 'w') as f:
+						f.write('\t'.join(w for w in ['Language', 'Speaker', 'Duration', 'WER']) + '\n')
+						for k, v in all_heldout_duration.items():
+							info = [lang_dir, k, v, all_heldout_wers[k]]
+							f.write('\t'.join(str(w) for w in info) + '\n')

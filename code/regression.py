@@ -144,6 +144,13 @@ def gather_train_features(file, corpus_data, temp_all_features):
 	train_ave_num_word = statistics.mean(train_num_word_list)
 	train_ave_word_type = statistics.mean(train_word_type_list)
 
+	print('Duration cutoff: ' + str(max(train_duration_list)))
+	print('Pitch cutoff: ' + str(max(train_pitch_list)))
+	print('Intensity cutoff: ' + str(max(train_intensity_list)))
+	print('PPL cutoff: ' + str(max(train_ppl_list)))
+	print('Num word cutoff: ' + str(max(train_num_word_list)))
+	print('Word type cutoff: ' + str(max(train_word_type_list)))
+
 	return train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov
 
 if __name__ == '__main__':
@@ -151,12 +158,14 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--input', type = str, help = 'ASR model output')
 	parser.add_argument('--state', type = str, help = 'whethere generating regression data or training regression models')
-#	parser.add_argument('--lang', type = str, help = 'language')
+	parser.add_argument('--lang', type = str, help = 'language')
 
 	args = parser.parse_args()
+	lang_dir = args.lang
 
 	if args.state == 'g':
-		for lang_dir in os.listdir(args.input):
+		if 2 > 1:
+	#	for lang_dir in os.listdir(args.input):
 			if lang_dir in ['fongbe']: #'wolof', 'iban',
 				regression_data = []
 
@@ -190,8 +199,9 @@ if __name__ == '__main__':
 
 						index = output_dir[6 : ]
 						alternative = all_features
+						print(evaluate_dir)
 						train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov = gather_train_features('data/' + lang_dir + '/' + evaluate_dir + '/train' + index + '/text', corpus_data, alternative)
-						print(train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov)
+					#	print(train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov)
 						all_features = {}
 						for i in range(len(audio_list)):
 							all_features[audio_list[i]] = [directory_list[i], transcript_list[i], duration_list[i], pitch_list[i], intensity_list[i], ppl_list[i], num_word_list[i], word_type_list[i], oov_list[i]]
@@ -253,29 +263,22 @@ if __name__ == '__main__':
 										info.append(lang_dir)
 
 										if len(info) == 29:
-									#	regression_data.append(info)
 											regression_file.write('\t'.join(str(w) for w in info) + '\n')
-								#		else:
-								#			print(info)
-								#			print('\n')
 
 								except:
 									pass
 
-		#		header = ['File', 'Path', 'Transcript', 'Duration', 'Pitch', 'Intensity', 'PPL', 'Num_word', 'Word_type', 'OOV', 'Train_Duration', 'Train_Pitch', 'Train_Intensity', 'Train_PPL', 'Train_Num_word', 'Train_Word_type', 'Train_OOV', 'Duration_ratio', 'Pitch_ratio', 'Intensity_ratio', 'PPL_ratio', 'Num_word_ratio', 'Word_type_ratio', 'OOV_ratio', 'WER', 'MER', 'WIL', 'Evaluation', 'Lang']
 
-		#		with io.open('data/' + lang_dir + '/' + lang_dir + '_regression.txt', 'w') as f:
-		#			f.write('\t'.join(w for w in header) + '\n')
-
-		#			for tok in regression_data:
-		#				f.write('\t'.join(str(w for w in tok)) + '\n')
-'''
 			if lang_dir in ['hupa']:
 				for quality in ['top_tier', 'second_tier']:
 					regression_data = []
 
+					header = ['File', 'Path', 'Transcript', 'Duration', 'Pitch', 'Intensity', 'PPL', 'Num_word', 'Word_type', 'OOV', 'Train_Duration', 'Train_Pitch', 'Train_Intensity', 'Train_PPL', 'Train_Num_word', 'Train_Word_type', 'Train_OOV', 'Duration_ratio', 'Pitch_ratio', 'Intensity_ratio', 'PPL_ratio', 'Num_word_ratio', 'Word_type_ratio', 'OOV_ratio', 'WER', 'MER', 'WIL', 'Evaluation', 'Lang']
+					regression_file = open('data/' + lang_dir + '/' + lang_dir + '_' + quality + '_regression.txt', 'w')
+					regression_file.write('\t'.join(w for w in header) + '\n')
+
 					if 'utterance_features.txt' not in os.listdir('data/' + lang_dir + '/' + quality + '/'):
-						all_features = gather_features('data/' + lang_dir + '/' + quality + '/' + '/audio_info.txt', 'data/' + lang_dir + '/' + quality + '/' + lang_dir + '_lm_info.txt', 'data/' + lang_dir + '/local/hupa_texts.txt', 'data/' + lang_dir + '/' + quality + '/')
+						temp_features = gather_features('data/' + lang_dir + '/' + quality + '/' + '/audio_info.txt', 'data/' + lang_dir + '/' + quality + '/' + lang_dir + '_lm_info.txt', 'data/' + lang_dir + '/local/hupa_texts.txt', 'data/' + lang_dir + '/' + quality + '/')
 
 					corpus_data = read_corpus('data/' + lang_dir + '/local/hupa_texts.txt')
 
@@ -300,7 +303,9 @@ if __name__ == '__main__':
 
 							index = output_dir[6 : ]
 							alternative = all_features
+							print(evaluate_dir)
 							train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov = gather_train_features('data/' + lang_dir + '/' + quality + '/' + evaluate_dir + '/train' + index + '/text', corpus_data, alternative)
+						#	print(train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov)
 							all_features = {}
 							for i in range(len(audio_list)):
 								all_features[audio_list[i]] = [directory_list[i], transcript_list[i], duration_list[i], pitch_list[i], intensity_list[i], ppl_list[i], num_word_list[i], word_type_list[i], oov_list[i]]
@@ -326,8 +331,8 @@ if __name__ == '__main__':
 
 							with io.open(best_d + '/log/decode.1.log', encoding = 'utf-8') as f:
 								for line in f:
+									utterance = line.strip().split()
 									try:
-										utterance = line.strip().split()
 										if utterance[0] in all_features:
 											ground_truth = all_features[utterance[0]][1]
 											hypothesis = ' '.join(w for w in utterance[1 : ])
@@ -361,15 +366,8 @@ if __name__ == '__main__':
 											info.append(evaluate_dir)
 											info.append(lang_dir)
 
-											regression_data.append(info)
+											if len(info) == 29:
+												regression_file.write('\t'.join(str(w) for w in info) + '\n')
+
 									except:
 										pass
-
-					header = ['File', 'Path', 'Transcript', 'Duration', 'Pitch', 'Intensity', 'PPL', 'Num_word', 'Word_type', 'OOV', 'Train_Duration', 'Train_Pitch', 'Train_Intensity', 'Train_PPL', 'Train_Num_word', 'Train_Word_type', 'Train_OOV', 'Duration_ratio', 'Pitch_ratio', 'Intensity_ratio', 'PPL_ratio', 'Num_word_ratio', 'Word_type_ratio', 'OOV_ratio', 'WER', 'MER', 'WIL', 'Evaluation', 'Lang']
-
-					with io.open('data/' + lang_dir + '/' + quality + '/' + lang_dir + '_' + quality + '_regression.txt', 'w') as f:
-						f.write('\t'.join(w for w in header) + '\n')
-
-						for tok in regression_data:
-							f.write('\t'.join(str(w for w in tok)) + '\n')
-'''

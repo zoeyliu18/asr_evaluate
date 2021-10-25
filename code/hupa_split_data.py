@@ -22,11 +22,37 @@ def gather_audio_info(file):
 
 	data = []
 
-	with io.open(file, encoding = 'utf-8') as f:
-		for line in f:
-			toks = line.strip().split('\t')
-			if toks[0].startswith('File') is False or toks[0] != 'File':
-				data.append(toks)
+	if 'lm' not in file:
+		with io.open(file, encoding = 'utf-8') as f:
+			for line in f:
+				toks = line.strip().split('\t')
+				if toks[0].startswith('File') is False or toks[0] != 'File':
+					new_toks = []
+					for w in toks[ : -1]:
+						new_toks.append(w)
+					new_transcript = []
+					for w in toks[-1].split()[:-2]:
+						new_transcript.append(w)
+					new_transcript = ' '.join(w for w in new_transcript)
+					new_toks.append(new_transcript)
+					data.append(new_toks)
+
+	else:
+		with io.open(file, encoding = 'utf-8') as f:
+			for line in f:
+				toks = line.strip().split('\t')
+				if toks[0].startswith('File') is False or toks[0] != 'File':
+					new_toks = []
+					for w in toks[ : 3]:
+						new_toks.append(w)
+					new_transcript = []
+					for w in toks[3].split()[:-2]:
+						new_transcript.append(w)
+					new_transcript = ' '.join(w for w in new_transcript)
+					new_toks.append(new_transcript)
+					for w in toks[-3 : ]:
+						new_toks.append(w)
+					data.append(new_toks)
 
 	return data
 
@@ -763,7 +789,7 @@ def average_intensity_threshold_different(audio_info_data, output, split_id, num
 
 	while dev_time <= time * HELDOUT_RATE:
 		for k, v in ave_intensity_dict.items():				
-			if v < cutoff:					
+			if v >= cutoff:					
 				dev_time += all_durations[k]
 				audio = k 
 				dev_audio.append(audio)
@@ -871,7 +897,7 @@ def average_pitch_threshold_different(audio_info_data, output, split_id, num_of_
 
 	while dev_time <= time * HELDOUT_RATE:
 		for k, v in ave_pitch_dict.items():				
-			if v < cutoff:					
+			if v >= cutoff:					
 				dev_time += all_durations[k]
 				audio = k 
 				dev_audio.append(audio)

@@ -408,7 +408,7 @@ def heldout_speaker(audio_info_data, output, lang, utt2spk_file = None):
 			speaker_audio_dict[speaker] = [audio[0]]
 		else:
 			speaker_audio_dict[speaker].append(audio[0])
-	print(set(speaker_list))
+
 	for speaker in set(speaker_list):
 		train_audio = []
 		dev_audio = []
@@ -837,20 +837,20 @@ def ppl_threshold_different(lm_info_data, output, split_id, lang, utt2spk_file =
 	train_audio = []
 	dev_audio = []
 
-	while dev_time <= time * HELDOUT_RATE:
+	while train_time <= time * (1 - HELDOUT_RATE):
 		for k, v in ppl_dict.items():				
-			if v < cutoff:					
-				dev_time += all_durations[k]
+			if v <= cutoff:					
+				train_time += all_durations[k]
 				audio = k 
-				dev_audio.append(audio)
-				if dev_time >= time * HELDOUT_RATE:
+				train_audio.append(audio)
+				if train_time >= time * (1 - HELDOUT_RATE):
 					break
 
 	for k, v in ppl_dict.items():
-		if k not in dev_audio:
-			train_time += all_durations[k]
+		if k not in train_audio:
+			dev_time += all_durations[k]
 			audio = k 
-			train_audio.append(audio)
+			dev_audio.append(audio)
 
 	print(cutoff)
 	print('\n')
@@ -878,7 +878,7 @@ def ppl_threshold_different(lm_info_data, output, split_id, lang, utt2spk_file =
 		new_train_audio = swahili_sort_audio_id(train_audio, utt2spk_file)
 		new_dev_audio = swahili_sort_audio_id(dev_audio, utt2spk_file)
 
-	else:
+	if lang == 'wolof':
 		new_train_audio = sort_audio_id(train_audio)
 		new_dev_audio = sort_audio_id(dev_audio)
 
@@ -1162,20 +1162,20 @@ def average_intensity_threshold_different(audio_info_data, output, split_id, lan
 	train_audio = []
 	dev_audio = []
 
-	while dev_time <= time * HELDOUT_RATE:
+	while train_time <= time * (1 - HELDOUT_RATE):
 		for k, v in ave_intensity_dict.items():				
 			if v < cutoff:					
-				dev_time += all_durations[k]
+				train_time += all_durations[k]
 				audio = k 
-				dev_audio.append(audio)
-				if dev_time >= time * HELDOUT_RATE:
+				train_audio.append(audio)
+				if train_time >= time * (1 - HELDOUT_RATE):
 					break
 
 	for k, v in ave_intensity_dict.items():
-		if k not in dev_audio:
-			train_time += all_durations[k]
+		if k not in train_audio:
+			dev_time += all_durations[k]
 			audio = k 
-			train_audio.append(audio)
+			dev_audio.append(audio)
 
 	print(cutoff)
 	print('\n')
@@ -1203,7 +1203,7 @@ def average_intensity_threshold_different(audio_info_data, output, split_id, lan
 		new_train_audio = swahili_sort_audio_id(train_audio, utt2spk_file)
 		new_dev_audio = swahili_sort_audio_id(dev_audio, utt2spk_file)
 
-	else:
+	if lang == 'wolof':
 		new_train_audio = sort_audio_id(train_audio)
 		new_dev_audio = sort_audio_id(dev_audio)
 
@@ -1273,7 +1273,7 @@ def average_pitch_threshold_different(audio_info_data, output, split_id, lang, u
 
 	while dev_time <= time * HELDOUT_RATE:
 		for k, v in ave_pitch_dict.items():				
-			if v < cutoff:					
+			if v >= cutoff:					
 				dev_time += all_durations[k]
 				audio = k 
 				dev_audio.append(audio)
@@ -1303,6 +1303,7 @@ def average_pitch_threshold_different(audio_info_data, output, split_id, lang, u
 	if lang == 'iban':
 		new_train_audio = iban_sort_audio_id(train_audio)
 		new_dev_audio = iban_sort_audio_id(dev_audio)
+		print(new_train_audio)
 
 	if lang == 'fongbe':
 		new_train_audio = fongbe_sort_audio_id(train_audio)
@@ -1312,7 +1313,7 @@ def average_pitch_threshold_different(audio_info_data, output, split_id, lang, u
 		new_train_audio = swahili_sort_audio_id(train_audio, utt2spk_file)
 		new_dev_audio = swahili_sort_audio_id(dev_audio, utt2spk_file)
 
-	else:
+	if lang == 'wolof':
 		new_train_audio = sort_audio_id(train_audio)
 		new_dev_audio = sort_audio_id(dev_audio)
 
@@ -1324,6 +1325,7 @@ def average_pitch_threshold_different(audio_info_data, output, split_id, lang, u
 
 	for i in range(len(new_train_audio)):
 		audio = new_train_audio[i]
+
 		train_texts.append(audio + ' ' + all_texts[audio])
 		train_wav.append(audio + ' ' + all_directories[audio])
 
