@@ -73,7 +73,7 @@ def gather_features(audio_info_file, lm_audio_info_file, corpus, output):
 
 	corpus_data = read_corpus(corpus)
 
-	all_features = []
+	collect_all_features = []
 
 	for audio, directory in directory_dict.items():
 		snd = parselmouth.Sound(directory)
@@ -96,20 +96,20 @@ def gather_features(audio_info_file, lm_audio_info_file, corpus, output):
 		transcript = transcript_dict[audio]
 		oov_rate = compute_oov(transcript, corpus_data)
 
-		all_features.append([audio, directory, transcript, duration_dict[audio], ave_pitch_dict[audio], ave_intensity_dict[audio], ppl_dict[audio], num_word_dict[audio], word_type_dict[audio], oov_rate])
+		collect_all_features.append([audio, directory, transcript, duration_dict[audio], ave_pitch_dict[audio], ave_intensity_dict[audio], ppl_dict[audio], num_word_dict[audio], word_type_dict[audio], oov_rate])
 
 	header = ['File', 'Path', 'Transcript', 'Duration', 'Pitch', 'Intensity', 'PPL', 'Num_word', 'Word_type', 'OOV']
 
 	with io.open(output + 'utterance_features.txt', 'w') as f:
 		f.write('\t'.join(w for w in header) + '\n')
-		for tok in all_features:
+		for tok in collect_all_features:
 			f.write('\t'.join(str(w) for w in tok) + '\n')
 
-	return all_features
+	return collect_all_features
 
 ### Gather training data features; average metrics ###
 
-def gather_train_features(file, corpus_data):
+def gather_train_features(file, corpus_data, temp_all_features):
 
 	train_data_features = {}
 	train_transcript_list = []
@@ -124,14 +124,14 @@ def gather_train_features(file, corpus_data):
 		for line in f:
 			toks = line.strip().split()
 			audio = toks[0]
-			info = all_features[audio]
-			train_transcript_list.append(info[1])
-			train_duration_list.append(float(info[2]))
-			train_pitch_list.append(float(info[3]))
-			train_intensity_list.append(float(info[4]))
-			train_ppl_list.append(float(info[5]))
-			train_num_word_list.append(int(info[6]))
-			train_word_type_list.append(int(info[7]))
+			temp_info = temp_all_features[audio]
+			train_transcript_list.append(temp_info[1])
+			train_duration_list.append(float(temp_info[2]))
+			train_pitch_list.append(float(temp_info[3]))
+			train_intensity_list.append(float(temp_info[4]))
+			train_ppl_list.append(float(temp_info[5]))
+			train_num_word_list.append(int(temp_info[6]))
+			train_word_type_list.append(int(temp_info[7]))
 
 	### Compute OOV rate of the whole training set ###
 	all_train_transcript = ' '.join(transcript for transcript in train_transcript_list)
@@ -157,7 +157,7 @@ if __name__ == '__main__':
 
 	if args.state == 'g':
 		for lang_dir in os.listdir(args.input):
-			if lang_dir in ['iban']: #'wolof', 'iban',
+			if lang_dir in ['fongbe']: #'wolof', 'iban',
 				regression_data = []
 
 				header = ['File', 'Path', 'Transcript', 'Duration', 'Pitch', 'Intensity', 'PPL', 'Num_word', 'Word_type', 'OOV', 'Train_Duration', 'Train_Pitch', 'Train_Intensity', 'Train_PPL', 'Train_Num_word', 'Train_Word_type', 'Train_OOV', 'Duration_ratio', 'Pitch_ratio', 'Intensity_ratio', 'PPL_ratio', 'Num_word_ratio', 'Word_type_ratio', 'OOV_ratio', 'WER', 'MER', 'WIL', 'Evaluation', 'Lang']
@@ -165,7 +165,7 @@ if __name__ == '__main__':
 				regression_file.write('\t'.join(w for w in header) + '\n')
 
 				if 'utterance_features.txt' not in os.listdir('data/' + lang_dir + '/'):
-					all_features = gather_features('data/' + lang_dir + '/audio_info.txt', 'data/' + lang_dir + '/' + lang_dir + '_lm_info.txt', 'data/' + lang_dir + '/local/corpus.txt', 'data/' + lang_dir + '/')
+					temp_features = gather_features('data/' + lang_dir + '/audio_info.txt', 'data/' + lang_dir + '/' + lang_dir + '_lm_info.txt', 'data/' + lang_dir + '/local/corpus.txt', 'data/' + lang_dir + '/')
 
 				corpus_data = read_corpus('data/' + lang_dir + '/local/corpus.txt')
 
@@ -189,8 +189,16 @@ if __name__ == '__main__':
 					for output_dir in os.listdir(args.input + lang_dir + '/' + evaluate_dir + '/'):
 
 						index = output_dir[6 : ]
+						alternative = all_features
+						train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov = gather_train_features('data/' + lang_dir + '/' + evaluate_dir + '/train' + index + '/text', corpus_data, alternative)
+						print(train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov)
+						all_features = {}
+						for i in range(len(audio_list)):
+							all_features[audio_list[i]] = [directory_list[i], transcript_list[i], duration_list[i], pitch_list[i], intensity_list[i], ppl_list[i], num_word_list[i], word_type_list[i], oov_list[i]]
 
-						train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov = gather_train_features('data/' + lang_dir + '/' + evaluate_dir + '/train' + index + '/text', corpus_data)
+						for k, v in all_features.items():
+							if len(v) != 9:
+								print(k, v)
 
 						wers = []
 						evaluations = []
@@ -207,12 +215,10 @@ if __name__ == '__main__':
 						best_d = evaluations[min_wer_idx][-1].split('/')[: -1]
 						best_d = '/'.join(w for w in best_d)
 
-						pred_dict = {}
-
 						with io.open(best_d + '/log/decode.1.log', encoding = 'utf-8') as f:
 							for line in f:
+								utterance = line.strip().split()
 								try:
-									utterance = line.strip().split()
 									if utterance[0] in all_features:
 										ground_truth = all_features[utterance[0]][1]
 										hypothesis = ' '.join(w for w in utterance[1 : ])
@@ -246,8 +252,13 @@ if __name__ == '__main__':
 										info.append(evaluate_dir)
 										info.append(lang_dir)
 
+										if len(info) == 29:
 									#	regression_data.append(info)
-										regression_file.write('\t'.join(str(w) for w in info))
+											regression_file.write('\t'.join(str(w) for w in info) + '\n')
+								#		else:
+								#			print(info)
+								#			print('\n')
+
 								except:
 									pass
 
@@ -288,8 +299,15 @@ if __name__ == '__main__':
 						for output_dir in os.listdir(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/'):
 
 							index = output_dir[6 : ]
+							alternative = all_features
+							train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov = gather_train_features('data/' + lang_dir + '/' + quality + '/' + evaluate_dir + '/train' + index + '/text', corpus_data, alternative)
+							all_features = {}
+							for i in range(len(audio_list)):
+								all_features[audio_list[i]] = [directory_list[i], transcript_list[i], duration_list[i], pitch_list[i], intensity_list[i], ppl_list[i], num_word_list[i], word_type_list[i], oov_list[i]]
 
-							train_ave_duration, train_ave_pitch, train_ave_intensity, train_ave_ppl, train_ave_num_word, train_ave_word_type, train_oov = gather_train_features('data/' + lang_dir + '/' + quality + '/' + evaluate_dir + '/train' + index + '/text', corpus_data)
+							for k, v in all_features.items():
+								if len(v) != 9:
+									print(k, v)
 
 							wers = []
 							evaluations = []
@@ -305,8 +323,6 @@ if __name__ == '__main__':
 
 							best_d = evaluations[min_wer_idx][-1].split('/')[: -1]
 							best_d = '/'.join(w for w in best_d)
-
-							pred_dict = {}
 
 							with io.open(best_d + '/log/decode.1.log', encoding = 'utf-8') as f:
 								for line in f:
