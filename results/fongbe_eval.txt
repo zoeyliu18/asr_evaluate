@@ -1,0 +1,54 @@
+Language	Speaker	Duration	WER	Evaluation
+fongbe	dolores	1199.5413770000014	29.33	heldout_speaker
+fongbe	sorel	143.22944	38.98	heldout_speaker
+fongbe	narcisse	158.318063	25.19	heldout_speaker
+fongbe	armandine	914.9652660000012	41.5	heldout_speaker
+fongbe	hans	178.282445	25.46	heldout_speaker
+fongbe	osias	467.8275610000004	33.1	heldout_speaker
+fongbe	herman	1265.6073259999994	27.6	heldout_speaker
+fongbe	parisius	1107.9519984999995	34.33	heldout_speaker
+fongbe	inconnu	1364.3207320000006	29.47	heldout_speaker
+fongbe	mario	1274.1534419999996	65.5	heldout_speaker
+fongbe	donald	335.9420660000001	25.48	heldout_speaker
+fongbe	nazer	1034.7551960000012	34.94	heldout_speaker
+fongbe	davacan	174.3808180000001	27.68	heldout_speaker
+fongbe	emmanuel	1033.5369770000011	57.22	heldout_speaker
+fongbe	miguel	1086.6710650000007	36.64	heldout_speaker
+fongbe	helmut	1291.0483720000007	24.57	heldout_speaker
+fongbe	frejus	1399.8523320000013	13.84	heldout_speaker
+fongbe	boris	717.2383289999997	33.52	heldout_speaker
+fongbe	rose	1468.9259229999998	29.76	heldout_speaker
+fongbe	denise	1197.227253	29.03	heldout_speaker
+fongbe	lorseque	1387.4195709999979	62.73	heldout_speaker
+fongbe	antoine	1249.3762469999988	10.8	heldout_speaker
+fongbe	stephanie	1008.5738845	28.84	heldout_speaker
+fongbe	eunice	885.7664500000005	39.14	heldout_speaker
+fongbe	cyrielle	1286.1948249999998	11.31	heldout_speaker
+fongbe	melissa	1014.8356300000005	28.84	heldout_speaker
+fongbe	mikael	1213.3806870000008	30.06	heldout_speaker
+fongbe	3	5172.627925499974	31.26	random_different
+fongbe	6	5173.570578499982	30.67	random_different
+fongbe	9	5172.590419499973	32.53	random_different
+fongbe	1	5172.15198499997	31.76	random_different
+fongbe	4	5172.751989499975	32.31	random_different
+fongbe	7	5176.235661499966	32.63	random_different
+fongbe	10	5174.352995999978	32.73	random_different
+fongbe	2	5174.395486999971	32.41	random_different
+fongbe	5	5173.641288999976	33.43	random_different
+fongbe	8	5173.869868999974	33.79	random_different
+fongbe	3	5133.117845999986	39.66	distance
+fongbe	6	5135.953657999987	40.12	distance
+fongbe	9	5133.117845999986	39.66	distance
+fongbe	1	5133.117845999986	39.66	distance
+fongbe	4	5136.543407999987	40.07	distance
+fongbe	7	5135.522659999986	39.88	distance
+fongbe	10	5133.117845999986	39.66	distance
+fongbe	2	5133.117845999986	39.66	distance
+fongbe	5	5133.117845999986	39.66	distance
+fongbe	8	5133.117845999986	39.66	distance
+fongbe			40.67	len_different
+fongbe			39.47	ave_pitch
+fongbe			45.74	ave_intensity
+fongbe			52.63	ppl
+fongbe			42.94	num_word
+fongbe			42.35	word_type

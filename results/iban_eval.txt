@@ -1,0 +1,50 @@
+Language	Speaker	Duration	WER	Evaluation
+iban	ibf_003	3027.306473000001	16.28	heldout_speaker
+iban	ibm_007	429.82230050000015	19.25	heldout_speaker
+iban	ibf_008	808.7189639999997	17.51	heldout_speaker
+iban	ibf_014	709.4335919999997	12.18	heldout_speaker
+iban	ibf_004	580.9812939999999	22.16	heldout_speaker
+iban	ibf_007	582.0668594999999	22.85	heldout_speaker
+iban	ibf_012	225.274107	20.17	heldout_speaker
+iban	ibm_003	702.7782520000001	19.04	heldout_speaker
+iban	ibm_004	3022.0550624999983	17.37	heldout_speaker
+iban	ibf_002	2185.7139779999993	13.12	heldout_speaker
+iban	ibf_001	568.8782730000001	11.61	heldout_speaker
+iban	ibm_010	408.868	22.94	heldout_speaker
+iban	ibm_001	4511.667786	13.07	heldout_speaker
+iban	ibf_005	2862.7507199999986	13.29	heldout_speaker
+iban	ibm_008	510.20605499999994	15.65	heldout_speaker
+iban	ibm_005	1987.0220529999986	14.54	heldout_speaker
+iban	ibf_015	213.83731299999997	18.97	heldout_speaker
+iban	ibf_006	667.4494640000003	10.44	heldout_speaker
+iban	ibm_002	2677.339493499999	16.06	heldout_speaker
+iban	ibf_010	471.25812599999983	17.97	heldout_speaker
+iban	ibf_013	507.45097500000014	23.0	heldout_speaker
+iban	ibf_011	778.5544309999999	14.32	heldout_speaker
+iban	ibm_006	2229.9721459999996	15.97	heldout_speaker
+iban	3	6137.565737999996	14.21	random_different
+iban	6	6135.8244369999975	14.26	random_different
+iban	9	6137.934644999991	15.44	random_different
+iban	1	6140.833499999987	14.22	random_different
+iban	4	6146.414963499994	14.59	random_different
+iban	7	6147.876576499996	14.77	random_different
+iban	10	6141.110510499995	14.04	random_different
+iban	2	6134.077345499996	13.84	random_different
+iban	5	6137.965527999995	13.88	random_different
+iban	8	6137.293255999992	13.31	random_different
+iban	3	5872.365284999997	12.93	distance
+iban	6	5885.379104999997	13.1	distance
+iban	9	5883.942042999997	12.84	distance
+iban	1	5875.277104999997	13.1	distance
+iban	4	5882.705284999997	12.99	distance
+iban	7	5900.471914999996	12.83	distance
+iban	10	5872.378104999998	13.08	distance
+iban	2	5912.362164999996	13.17	distance
+iban	5	5874.467284999997	13.12	distance
+iban	8	5878.842164999997	13.22	distance
+iban			15.68	len_different
+iban			14.29	ave_pitch
+iban			16.45	ave_intensity
+iban			25.76	ppl
+iban			13.68	num_word
+iban			12.94	word_type

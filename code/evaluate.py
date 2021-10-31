@@ -15,7 +15,8 @@ if __name__ == '__main__':
 			if lang_dir in ['fongbe', 'swahili', 'wolof', 'iban']:
 				for evaluate_dir in os.listdir(args.input + lang_dir + '/'):
 					for output_dir in os.listdir(args.input + lang_dir + '/' + evaluate_dir + '/'):
-						if 'RESULTS' not in os.listdir(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/') or os.stat(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/RESULTS').st_size == 0:
+						if 2 > 1:
+					#	if 'RESULTS' not in os.listdir(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/') or os.stat(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/RESULTS').st_size == 0:
 							index = output_dir[6 : ]
 
 							gold_dict = {}
@@ -47,7 +48,7 @@ if __name__ == '__main__':
 										wers.append(toks[1])
 										evaluations.append(toks)
 
-							else:
+							if len(evaluations) != 14:
 								with io.open('evaluate.sh', 'w', encoding = 'utf-8') as eval:
 									eval.write('for x in ' + args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/*/decode_*; do [ -d $x ] && grep WER $x/wer_* | utils/best_wer.sh; done > ' + args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/RESULTS')
 									eval.write('\n')
@@ -88,11 +89,12 @@ if __name__ == '__main__':
 						#			f.write('CER: ' + str(round(wer(gold, pred) * 100 / 2)) + '\n')
 						#			f.write('CER word level: ' + str(round(wer(gold_word, pred_word) * 100 / 2)) + '\n')
 
-			if lang_dir == 'hupa':
+			if lang_dir in ['hupa', 'hupa_with_trans']:
 				for quality in ['top_tier', 'second_tier']:
 					for evaluate_dir in os.listdir(args.input + lang_dir + '/' + quality + '/'):
 						for output_dir in os.listdir(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/'):
-							if 'RESULTS' not in os.listdir(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/') or os.stat(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/RESULTS').st_size == 0:
+							if 2 > 1:
+						#	if 'RESULTS' not in os.listdir(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/') or os.stat(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/RESULTS').st_size == 0:
 								index = output_dir[6 : ]
 
 								gold_dict = {}
@@ -103,7 +105,7 @@ if __name__ == '__main__':
 								gold_word = []
 								pred_word = []
 
-								with io.open('data/' + lang_dir + '/' + quality + '/' + evaluate_dir + '/dev' + index + '/text', encoding = 'utf-8') as f:
+								with io.open('data/' + 'hupa' + '/' + quality + '/' + evaluate_dir + '/dev' + index + '/text', encoding = 'utf-8') as f:
 									for line in f:
 										utterance = line.strip().split()
 										toks = utterance[1 : ]
@@ -124,7 +126,8 @@ if __name__ == '__main__':
 											wers.append(toks[1])
 											evaluations.append(toks)
 
-								else:
+								if len(evaluations) != 14:
+									print(len(evaluations))
 									with io.open('evaluate.sh', 'w', encoding = 'utf-8') as eval:
 										eval.write('for x in ' + args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/*/decode_*; do [ -d $x ] && grep WER $x/wer_* | utils/best_wer.sh; done > ' + args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/RESULTS')
 										eval.write('\n')
@@ -138,6 +141,7 @@ if __name__ == '__main__':
 											evaluations.append(toks)
 
 								if len(wers) != 14:
+									print(len(wers))
 									print('Output not complete ' + args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir)
 									pass
 
@@ -163,9 +167,14 @@ if __name__ == '__main__':
 
 	if args.state == 'a':
 		for lang_dir in os.listdir(args.input):
-			if lang_dir in ['fongbe', 'swahili', 'wolof', 'iban']:
+			if lang_dir in ['fongbe', 'swahili', 'iban']:
+				all_wers_results = {}
 				all_heldout_wers = {}
 				all_heldout_duration = {}
+				all_random_wers = {}
+				all_random_duration = {}
+				all_distance_wers = {}
+				all_distance_duration = {}
 
 				for evaluate_dir in os.listdir(args.input + lang_dir + '/'):
 
@@ -191,6 +200,10 @@ if __name__ == '__main__':
 
 								if evaluate_dir == 'heldout_speaker':
 									all_heldout_wers[output_dir[6 : ]] = min(wers)
+								if evaluate_dir == 'random_different':
+									all_random_wers[output_dir[6 : ]] = min(wers)
+								if evaluate_dir == 'distance':
+									all_distance_wers[output_dir[6 : ]] = min(wers)
 						else:
 							print(lang_dir + '/' + evaluate_dir + '/' + output_dir + ' No Results')
 
@@ -199,7 +212,8 @@ if __name__ == '__main__':
 							print(lang_dir + '\t' + evaluate_dir + '\t' + str(statistics.mean(all_wers)) + '\t' + str(len(all_wers)) + '\t' + str(statistics.stdev(all_wers)) + '\t' +  str(max(all_wers) - min(all_wers)))
 						else:
 							print(lang_dir + '\t' + evaluate_dir + '\t' + str(statistics.mean(all_wers)) + '\t' + str(len(all_wers)))
-
+							all_wers_results[evaluate_dir] = statistics.mean(all_wers)
+				print(all_wers_results)
 				for k, v in all_heldout_wers.items():
 					dev_duration = 0
 					with io.open('data/' + lang_dir + '/heldout_speaker/dev' + k + '/utt2dur') as f:
@@ -208,16 +222,48 @@ if __name__ == '__main__':
 							dev_duration += float(toks[1])
 					all_heldout_duration[k] = dev_duration
 
-				with io.open(lang_dir + '_heldout_eval.txt', 'w') as f:
-					f.write('\t'.join(w for w in ['Language', 'Speaker', 'Duration', 'WER']) + '\n')
+				for k, v in all_random_wers.items():
+					dev_duration = 0
+					with io.open('data/' + lang_dir + '/random_different/dev' + k + '/utt2dur') as f:
+						for line in f:
+							toks = line.strip().split()
+							dev_duration += float(toks[1])
+					all_random_duration[k] = dev_duration
+
+				for k, v in all_distance_wers.items():
+					dev_duration = 0
+					with io.open('data/' + lang_dir + '/distance/dev' + k + '/utt2dur') as f:
+						for line in f:
+							toks = line.strip().split()
+							dev_duration += float(toks[1])
+					all_distance_duration[k] = dev_duration
+
+				with io.open(lang_dir + '_eval.txt', 'w') as f:
+					f.write('\t'.join(w for w in ['Language', 'Speaker', 'Duration', 'WER', 'Evaluation']) + '\n')
 					for k, v in all_heldout_duration.items():
-						info = [lang_dir, k, v, all_heldout_wers[k]]
+						info = [lang_dir, k, v, all_heldout_wers[k], 'heldout_speaker']
+						f.write('\t'.join(str(w) for w in info) + '\n')
+					for k, v in all_random_duration.items():
+						info = [lang_dir, k, v, all_random_wers[k], 'random_different']
+						f.write('\t'.join(str(w) for w in info) + '\n')
+					for k, v in all_distance_duration.items():
+						info = [lang_dir, k, v, all_distance_wers[k], 'distance']
 						f.write('\t'.join(str(w) for w in info) + '\n')
 
-			if lang_dir in ['hupa']: #'wolof', 'iban',
+				#	for evaluate_dir in ['len_different', 'ave_pitch', 'ave_intensity', 'ppl', 'num_word', 'word_type']:
+				#		info = [lang_dir, '', '', all_wers_results[evaluate_dir], evaluate_dir]
+				#		f.write('\t'.join(str(w) for w in info) + '\n')
+
+
+			if lang_dir in ['hupa', 'hupa_with_trans']:
 				for quality in ['top_tier', 'second_tier']:
+					all_wers_results = {}
 					all_heldout_wers = {}
 					all_heldout_duration = {}
+					all_random_wers = {}
+					all_random_duration = {}
+					all_distance_wers = {}
+					all_distance_duration = {}
 
 					for evaluate_dir in os.listdir(args.input + lang_dir + '/' + quality + '/'):
 						all_wers = []
@@ -236,12 +282,17 @@ if __name__ == '__main__':
 								if wers == []:
 									print(lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + ' Results EMPTY')
 								elif len(wers) != 14:
+									print(len(wers))
 									print(lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + ' Results Not Complete')
 								else:
 									all_wers.append(min(wers))
 
 									if evaluate_dir == 'dates':
 										all_heldout_wers[output_dir[6 : ]] = min(wers)
+									if evaluate_dir == 'random':
+										all_random_wers[output_dir[6 : ]] = min(wers)
+									if evaluate_dir == 'distance':
+										all_distance_wers[output_dir[6 : ]] = min(wers)
 							else:
 								print(lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + ' No Results')
 
@@ -250,17 +301,47 @@ if __name__ == '__main__':
 								print(lang_dir + '\t' + quality + '\t' + evaluate_dir + '\t' + str(round(statistics.mean(all_wers), 2)) + '\t' + str(len(all_wers)) + '\t' + str(round(statistics.stdev(all_wers), 2)) + '\t' +  str(round(max(all_wers) - min(all_wers), 2)))
 							else:
 								print(lang_dir + '\t' + quality + '\t' + evaluate_dir + '\t' + str(round(statistics.mean(all_wers), 2)) + '\t' + str(len(all_wers)))
-
+								all_wers_results[evaluate_dir] = statistics.mean(all_wers)
+					print(all_wers_results)
 					for k, v in all_heldout_wers.items():
 						dev_duration = 0
-						with io.open('data/' + lang_dir + '/' + quality + '/dates/dev' + k + '/utt2dur') as f:
+						with io.open('data/' + 'hupa' + '/' + quality + '/dates/dev' + k + '/utt2dur') as f:
 							for line in f:
 								toks = line.strip().split()
 								dev_duration += float(toks[1])
 						all_heldout_duration[k] = dev_duration
 
-					with io.open(lang_dir + '_' + quality + '_heldout_eval.txt', 'w') as f:
-						f.write('\t'.join(w for w in ['Language', 'Speaker', 'Duration', 'WER']) + '\n')
+					for k, v in all_random_wers.items():
+						dev_duration = 0
+						with io.open('data/' + 'hupa' + '/' + quality + '/random/dev' + k + '/utt2dur') as f:
+							for line in f:
+								toks = line.strip().split()
+								dev_duration += float(toks[1])
+						all_random_duration[k] = dev_duration
+
+					for k, v in all_distance_wers.items():
+						dev_duration = 0
+						with io.open('data/' + 'hupa' + '/' + quality + '/distance/dev' + k + '/utt2dur') as f:
+							for line in f:
+								toks = line.strip().split()
+								dev_duration += float(toks[1])
+						all_distance_duration[k] = dev_duration
+
+					with io.open(lang_dir + '_' + quality + '_eval.txt', 'w') as f:
+						f.write('\t'.join(w for w in ['Language', 'Speaker', 'Duration', 'WER', 'Evaluation']) + '\n')
 						for k, v in all_heldout_duration.items():
 							info = [lang_dir, k, v, all_heldout_wers[k]]
 							f.write('\t'.join(str(w) for w in info) + '\n')
+						for k, v in all_random_duration.items():
+							info = [lang_dir, k, v, all_random_wers[k], 'random_different']
+							f.write('\t'.join(str(w) for w in info) + '\n')
+						for k, v in all_distance_duration.items():
+							info = [lang_dir, k, v, all_distance_wers[k], 'distance']
+							f.write('\t'.join(str(w) for w in info) + '\n')
+
+#						for evaluate_dir in ['len']:
+#							info = [lang_dir, '', '', all_wers_results[evaluate_dir], 'len_different']
+#							f.write('\t'.join(str(w) for w in info) + '\n')
+#						for evaluate_dir in ['ave_pitch', 'ave_intensity', 'ppl', 'num_word', 'word_type']:
+#							info = [lang_dir, '', '', all_wers_results[evaluate_dir], evaluate_dir]
+#							f.write('\t'.join(str(w) for w in info) + '\n')

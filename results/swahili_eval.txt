@@ -1,0 +1,63 @@
+Language	Speaker	Duration	WER	Evaluation
+swahili	SWH-15-20101130	1397.5201239999997	31.57	heldout_speaker
+swahili	SWH-15-20101227	1545.4296189999986	24.4	heldout_speaker
+swahili	SWH-15-20101104	1720.3315619999998	27.49	heldout_speaker
+swahili	SWH-05-20101113	571.6211280000001	18.81	heldout_speaker
+swahili	SWH-15-20101117	1333.180434	25.28	heldout_speaker
+swahili	SWH-05-20101124	659.6100639999992	22.33	heldout_speaker
+swahili	SWH-05-20101106	639.1496290000003	22.56	heldout_speaker
+swahili	SWH-15-20110203	1445.372679999999	25.81	heldout_speaker
+swahili	SWH-05-20101123	750.6688819999999	25.1	heldout_speaker
+swahili	SWH-05-20110123	771.7793789999995	22.91	heldout_speaker
+swahili	SWH-05-20101110	1540.1821929999994	31.27	heldout_speaker
+swahili	SWH-05-20110114	560.650249	29.59	heldout_speaker
+swahili	SWH-15-20110310	1512.6564389999976	26.33	heldout_speaker
+swahili	SWH-15-20101115	1550.7187969999995	23.17	heldout_speaker
+swahili	SWH-05-20110215	743.9910029999998	23.34	heldout_speaker
+swahili	SWH-05-20110125	666.4095000000004	22.51	heldout_speaker
+swahili	SWH-15-20101109	1424.229881	26.59	heldout_speaker
+swahili	SWH-05-20101121	795.9399960000002	36.4	heldout_speaker
+swahili	SWH-15-20110124	1527.878180999998	26.92	heldout_speaker
+swahili	SWH-05-20110317	630.6204349999997	26.71	heldout_speaker
+swahili	SWH-15-20110303	1468.8414429999968	24.38	heldout_speaker
+swahili	SWH-05-20101111	602.7098129999996	27.21	heldout_speaker
+swahili	SWH-05-20101222	654.6999999999995	24.86	heldout_speaker
+swahili	SWH-05-20110321	574.0605019999999	30.56	heldout_speaker
+swahili	SWH-05-20101107	707.859808	25.42	heldout_speaker
+swahili	SWH-15-20110126	1480.840253	25.6	heldout_speaker
+swahili	SWH-05-20101109	804.4094419999997	27.81	heldout_speaker
+swahili	SWH-15-20110224	1532.343442999999	30.27	heldout_speaker
+swahili	SWH-15-20110311	1415.5004329999986	23.4	heldout_speaker
+swahili	SWH-15-20110207	1608.7912519999988	29.74	heldout_speaker
+swahili	SWH-15-20110323	1662.5300459999987	25.07	heldout_speaker
+swahili	SWH-05-20110327	702.1592479999998	21.15	heldout_speaker
+swahili	SWH-05-20101112	622.5298760000003	29.92	heldout_speaker
+swahili	SWH-05-20101211	798.5794369999988	24.54	heldout_speaker
+swahili	SWH-15-20101113	1441.4085599999985	27.9	heldout_speaker
+swahili	SWH-15-20101103	1612.6887479999991	28.67	heldout_speaker
+swahili	3	7896.0752370000455	25.74	random_different
+swahili	6	7896.526623000031	25.17	random_different
+swahili	9	7899.493999000049	26.29	random_different
+swahili	1	7896.768669000049	26.19	random_different
+swahili	4	7897.0241230000265	25.36	random_different
+swahili	7	7897.904495000048	25.93	random_different
+swahili	10	7897.979688000041	25.16	random_different
+swahili	2	7896.651116000037	26.21	random_different
+swahili	5	7898.342627000045	25.63	random_different
+swahili	8	7896.630170000025	25.69	random_different
+swahili	3	7593.511395000012	25.81	distance
+swahili	6	7593.001521000011	25.99	distance
+swahili	9	7611.14120900001	25.76	distance
+swahili	1	7620.861395000012	25.84	distance
+swahili	4	7638.740964000008	25.38	distance
+swahili	7	7623.251333000012	25.98	distance
+swahili	10	7643.480902000007	25.43	distance
+swahili	2	7612.381272000011	25.82	distance
+swahili	5	7633.440777000007	25.27	distance
+swahili	8	7635.681216000006	25.45	distance
+swahili			26.32	len_different
+swahili			28.8	ave_pitch
+swahili			28.34	ave_intensity
+swahili			45.43	ppl
+swahili			25.95	num_word
+swahili			24.92	word_type
