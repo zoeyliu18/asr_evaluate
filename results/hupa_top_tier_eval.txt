@@ -36,3 +36,9 @@ hupa	10	1967.9520640000003	56.81	distance
 hupa	2	1968.1730640000003	57.14	distance
 hupa	5	1966.1590640000002	57.55	distance
 hupa	8	1968.8280640000003	57.2	distance
+hupa			98.91	len_different
+hupa			98.28	ave_pitch
+hupa			98.02	ave_intensity
+hupa			54.3	ppl
+hupa			54.68	num_word
+hupa			54.28	word_type

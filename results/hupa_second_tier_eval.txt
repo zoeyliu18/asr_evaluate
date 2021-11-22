@@ -45,7 +45,17 @@ hupa	5	5489.454998000001	52.39	random_different
 hupa	8	5498.645060000002	53.62	random_different
 hupa	3	8630.189374000003	52.98	distance
 hupa	6	8661.151374000005	52.63	distance
+hupa	9	8651.303374000003	53.85	distance
 hupa	1	8630.150311000005	52.5	distance
 hupa	4	8669.981311000005	52.61	distance
+hupa	7	8632.946311000005	52.05	distance
+hupa	10	8648.208374000003	52.42	distance
 hupa	2	8674.367374000003	52.37	distance
 hupa	5	8628.349311000005	52.53	distance
+hupa	8	8652.058311000004	52.38	distance
+hupa			50.42	len_different
+hupa			94.92	ave_pitch
+hupa			95.15	ave_intensity
+hupa			51.46	ppl
+hupa			50.41	num_word
+hupa			51.67	word_type

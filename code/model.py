@@ -14,10 +14,11 @@ def normalize(df):
     return result
 
 
-data = pd.read_csv('data/wolof/wolof_regression.txt', sep = '\t')
+data = pd.read_csv('data/hupa/hupa_top_tier_regression.txt', sep = '\t')
 X = data[['Duration_ratio', 'Pitch_ratio', 'Intensity_ratio', 'PPL_ratio', 'Num_word_ratio', 'Word_type_ratio', 'OOV_ratio']]
 #X = normalize(X)
 X = MinMaxScaler().fit_transform(X)
+X = pd.DataFrame(X, columns = ['Duration_ratio', 'Pitch_ratio', 'Intensity_ratio', 'PPL_ratio', 'Num_word_ratio', 'Word_type_ratio', 'OOV_ratio'])
 X = sm.add_constant(X)
 new_data = X
 new_data['WER'] = data['WER']

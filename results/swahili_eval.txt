@@ -57,7 +57,7 @@ swahili	5	7633.440777000007	25.27	distance
 swahili	8	7635.681216000006	25.45	distance
 swahili			26.32	len_different
 swahili			28.8	ave_pitch
-swahili			28.34	ave_intensity
+swahili			26.47	ave_intensity
 swahili			45.43	ppl
 swahili			25.95	num_word
 swahili			24.92	word_type

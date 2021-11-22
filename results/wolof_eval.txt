@@ -38,5 +38,8 @@ wolof	2	9920.405747999986	25.69	distance
 wolof	5	9920.405747999986	25.69	distance
 wolof	8	9426.070997999988	25.6	distance
 wolof			31.37	len_different
-wolof			28.05	ave_pitch
-wolof			29.45	ave_intensity
+wolof			33.73	ave_pitch
+wolof			33.18	ave_intensity
+wolof			41.89	ppl
+wolof			29.27	num_word
+wolof			28.79	word_type
