@@ -158,15 +158,11 @@ def split_wav(audio_file, file_id, path, output, num_of_speakers):
 				print(new_w)
 
 		audio_chunk = audio[start:end]
-	#	audio_chunk.export(output + '/' + "verdena_1_" + label + '_' + str(idx + 1) + ".wav", format = "wav")
-	#	text.append("verdena_1_" + label + '_' + str(idx + 1) + ' ' + data[idx][-1] + ' ' + str(start) + ' ' + str(end))
 		audio_chunk.export(output + '/' + "verdena_" + num_of_speakers +  "_" + new_file_id + ".wav", format = "wav")	
 
 		new_transcript = ' '.join(w for w in new_transcript)
 
 		corpus.append(new_transcript)
-
-	#	text.append("verdena_" + num_of_speakers +  "_" + new_file_id + ' ' + data[idx][-1] + ' ' + str(start) + ' ' + str(end))
 
 		text.append("verdena_" + num_of_speakers +  "_" + new_file_id + ' ' + new_transcript + ' ' + str(start) + ' ' + str(end))
 	
