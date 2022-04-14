@@ -1,6 +1,6 @@
 Language	Speaker	Duration	WER	Evaluation
 wolof	14	4024.3259999999987	31.84	heldout_speaker
-wolof	18	3919.569812	29.26	heldout_speaker
+wolof	18	3919.569812	29.34	heldout_speaker
 wolof	3	1886.0783759999995	21.73	heldout_speaker
 wolof	13	4803.688375999998	28.03	heldout_speaker
 wolof	6	2487.2813120000033	19.58	heldout_speaker
@@ -17,29 +17,32 @@ wolof	5	906.9878120000003	21.63	heldout_speaker
 wolof	8	4274.317126000003	22.88	heldout_speaker
 wolof	11	4697.128872999999	32.58	heldout_speaker
 wolof	15	4237.136190000002	23.99	heldout_speaker
+wolof	14	13663.317875000017	27.86	random_different
+wolof	18	13658.872247000021	28.19	random_different
 wolof	3	13660.855624000009	28.62	random_different
+wolof	13	13658.956377	28.34	random_different
 wolof	6	13660.133938999985	29.0	random_different
 wolof	9	13658.923184999983	28.08	random_different
-wolof	1	13657.443002000009	28.58	random_different
+wolof	17	13658.549564999985	28.64	random_different
+wolof	1	13657.443002000009	28.59	random_different
 wolof	4	13659.086877000012	28.62	random_different
 wolof	7	13660.21937899999	28.82	random_different
+wolof	12	13660.144686000005	28.28	random_different
+wolof	16	13659.786370999955	28.25	random_different
 wolof	10	13663.17887699998	28.71	random_different
 wolof	2	13659.597062000003	28.72	random_different
 wolof	5	13659.633750000005	27.8	random_different
 wolof	8	13657.199999999992	27.9	random_different
-wolof	3	9893.881747999989	25.52	distance
-wolof	6	9893.881747999989	25.53	distance
-wolof	9	9893.881747999989	25.51	distance
-wolof	1	9893.881747999989	25.5	distance
-wolof	4	9905.326747999989	25.56	distance
-wolof	7	9893.881747999989	25.52	distance
-wolof	10	9909.566747999988	25.69	distance
-wolof	2	9920.405747999986	25.69	distance
+wolof	11	13657.362063	28.62	random_different
+wolof	15	13659.848002000008	28.75	random_different
+wolof	3	9909.566747999988	25.69	distance
+wolof	1	9909.566747999988	25.69	distance
+wolof	4	9920.405747999986	25.69	distance
+wolof	2	9893.881747999989	25.5	distance
 wolof	5	9920.405747999986	25.69	distance
-wolof	8	9426.070997999988	25.6	distance
+wolof			28.88	ave_pitch
+wolof			29.87	ave_intensity
+wolof			28.07	num_word
 wolof			31.37	len_different
-wolof			33.73	ave_pitch
-wolof			33.18	ave_intensity
-wolof			41.89	ppl
-wolof			29.27	num_word
-wolof			28.79	word_type
+wolof			28.85	word_type
+wolof			42.63	ppl

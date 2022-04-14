@@ -66,11 +66,8 @@ if __name__ == '__main__':
 								pass
 
 							else:
-								min_wer = min(wers)
-								min_wer_idx = wers.index(min_wer)
-
-								best_d = evaluations[min_wer_idx][-1].split('/')[: -1]
-								best_d = '/'.join(w for w in best_d)
+								
+								best_d = args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/dnn4b_pretrain-dbn_dnn_smbr/decode_dev_it6/'					
 
 								with io.open(best_d + '/log/decode.1.log', encoding = 'utf-8') as f:
 									for line in f:
@@ -146,11 +143,8 @@ if __name__ == '__main__':
 									pass
 
 								else:
-									min_wer = min(wers)
-									min_wer_idx = wers.index(min_wer)
-
-									best_d = evaluations[min_wer_idx][-1].split('/')[: -1]
-									best_d = '/'.join(w for w in best_d)
+									
+									best_d = args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/dnn4b_pretrain-dbn_dnn_smbr/decode_dev_it6/'					
 
 									with io.open(best_d + '/log/decode.1.log', encoding = 'utf-8') as f:
 										for line in f:
@@ -167,7 +161,7 @@ if __name__ == '__main__':
 
 	if args.state == 'a':
 		for lang_dir in os.listdir(args.input):
-			if lang_dir in ['fongbe', 'swahili', 'iban']:
+			if lang_dir in ['fongbe', 'wolof', 'iban', 'swahili']:
 				all_wers_results = {}
 				all_heldout_wers = {}
 				all_heldout_duration = {}
@@ -188,13 +182,12 @@ if __name__ == '__main__':
 						if 'RESULTS' in os.listdir(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/'):
 							with io.open(args.input + lang_dir + '/' + evaluate_dir + '/' + output_dir + '/RESULTS', encoding = 'utf-8') as f:
 								for line in f:
-									toks = line.split()
-									wers.append(float(toks[1]))
+									if '/dnn4b_pretrain-dbn_dnn_smbr/decode_dev_it6' in line:
+										toks = line.split()
+										wers.append(float(toks[1]))
 
 							if wers == []:
 								print(lang_dir + '/' + evaluate_dir + '/' + output_dir + ' Results EMPTY')
-							elif len(wers) != 14:
-								print(lang_dir + '/' + evaluate_dir + '/' + output_dir + ' Results Not Complete')
 							else:
 								all_wers.append(min(wers))
 
@@ -211,9 +204,9 @@ if __name__ == '__main__':
 						if evaluate_dir in ['random_different', 'distance', 'heldout_speaker']:
 							print(lang_dir + '\t' + evaluate_dir + '\t' + str(statistics.mean(all_wers)) + '\t' + str(len(all_wers)) + '\t' + str(statistics.stdev(all_wers)) + '\t' +  str(max(all_wers) - min(all_wers)))
 						else:
-							print(lang_dir + '\t' + evaluate_dir + '\t' + str(statistics.mean(all_wers)) + '\t' + str(len(all_wers)))
+							print(lang_dir + '\t' + evaluate_dir + '\t' + str(statistics.mean(all_wers)) + '\t' + str(all_wers[0]))
 							all_wers_results[evaluate_dir] = statistics.mean(all_wers)
-				print(all_wers_results)
+
 				for k, v in all_heldout_wers.items():
 					dev_duration = 0
 					with io.open('data/' + lang_dir + '/heldout_speaker/dev' + k + '/utt2dur') as f:
@@ -241,7 +234,11 @@ if __name__ == '__main__':
 				with io.open(lang_dir + '_eval.txt', 'w') as f:
 					f.write('\t'.join(w for w in ['Language', 'Speaker', 'Duration', 'WER', 'Evaluation']) + '\n')
 					for k, v in all_heldout_duration.items():
-						info = [lang_dir, k, v, all_heldout_wers[k], 'heldout_speaker']
+						info = ''
+						if lang_dir != 'swahili':
+							info = [lang_dir, k, v, all_heldout_wers[k], 'heldout_speaker']
+						else:
+							info = [lang_dir, k, v, all_heldout_wers[k], 'heldout_session']
 						f.write('\t'.join(str(w) for w in info) + '\n')
 					for k, v in all_random_duration.items():
 						info = [lang_dir, k, v, all_random_wers[k], 'random_different']
@@ -249,13 +246,12 @@ if __name__ == '__main__':
 					for k, v in all_distance_duration.items():
 						info = [lang_dir, k, v, all_distance_wers[k], 'distance']
 						f.write('\t'.join(str(w) for w in info) + '\n')
+					for k, v in all_wers_results.items():
+						print(k, v)
+						info = [lang_dir, '', '', v, k]
+						f.write('\t'.join(str(w) for w in info) + '\n')
 
-				#	for evaluate_dir in ['len_different', 'ave_pitch', 'ave_intensity', 'ppl', 'num_word', 'word_type']:
-				#		info = [lang_dir, '', '', all_wers_results[evaluate_dir], evaluate_dir]
-				#		f.write('\t'.join(str(w) for w in info) + '\n')
-
-
-			if lang_dir in ['hupa', 'hupa_with_trans']:
+			if lang_dir in ['hupa']:
 				for quality in ['top_tier', 'second_tier']:
 					all_wers_results = {}
 					all_heldout_wers = {}
@@ -276,14 +272,12 @@ if __name__ == '__main__':
 							if 'RESULTS' in os.listdir(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/'):
 								with io.open(args.input + lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + '/RESULTS', encoding = 'utf-8') as f:
 									for line in f:
-										toks = line.split()
-										wers.append(float(toks[1]))
+										if '/dnn4b_pretrain-dbn_dnn_smbr/decode_dev_it6' in line:
+											toks = line.split()
+											wers.append(float(toks[1]))
 
 								if wers == []:
 									print(lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + ' Results EMPTY')
-								elif len(wers) != 14:
-									print(len(wers))
-									print(lang_dir + '/' + quality + '/' + evaluate_dir + '/' + output_dir + ' Results Not Complete')
 								else:
 									all_wers.append(min(wers))
 
@@ -298,11 +292,14 @@ if __name__ == '__main__':
 
 						if all_wers != []:
 							if evaluate_dir in ['random', 'distance', 'dates']:
-								print(lang_dir + '\t' + quality + '\t' + evaluate_dir + '\t' + str(round(statistics.mean(all_wers), 2)) + '\t' + str(len(all_wers)) + '\t' + str(round(statistics.stdev(all_wers), 2)) + '\t' +  str(round(max(all_wers) - min(all_wers), 2)))
+								try:
+									print(lang_dir + '\t' + quality + '\t' + evaluate_dir + '\t' + str(round(statistics.mean(all_wers), 2)) + '\t' + str(len(all_wers)) + '\t' + str(round(statistics.stdev(all_wers), 2)) + '\t' +  str(round(max(all_wers) - min(all_wers), 2)))
+								except:
+									print(lang_dir + '\t' + quality + '\t' + evaluate_dir + '\t' + str(len(all_wers)))
 							else:
-								print(lang_dir + '\t' + quality + '\t' + evaluate_dir + '\t' + str(round(statistics.mean(all_wers), 2)) + '\t' + str(len(all_wers)))
+								print(lang_dir + '\t' + quality + '\t' + evaluate_dir + '\t' + str(all_wers[0]))
 								all_wers_results[evaluate_dir] = statistics.mean(all_wers)
-					print(all_wers_results)
+
 					for k, v in all_heldout_wers.items():
 						dev_duration = 0
 						with io.open('data/' + 'hupa' + '/' + quality + '/dates/dev' + k + '/utt2dur') as f:
@@ -330,7 +327,7 @@ if __name__ == '__main__':
 					with io.open(lang_dir + '_' + quality + '_eval.txt', 'w') as f:
 						f.write('\t'.join(w for w in ['Language', 'Speaker', 'Duration', 'WER', 'Evaluation']) + '\n')
 						for k, v in all_heldout_duration.items():
-							info = [lang_dir, k, v, all_heldout_wers[k]]
+							info = [lang_dir, k, v, all_heldout_wers[k], 'heldout_session']
 							f.write('\t'.join(str(w) for w in info) + '\n')
 						for k, v in all_random_duration.items():
 							info = [lang_dir, k, v, all_random_wers[k], 'random_different']
@@ -338,10 +335,7 @@ if __name__ == '__main__':
 						for k, v in all_distance_duration.items():
 							info = [lang_dir, k, v, all_distance_wers[k], 'distance']
 							f.write('\t'.join(str(w) for w in info) + '\n')
+						for k, v in all_wers_results.items():
+							info = [lang_dir, '', '', v, k]
+							f.write('\t'.join(str(w) for w in info) + '\n')
 
-#						for evaluate_dir in ['len']:
-#							info = [lang_dir, '', '', all_wers_results[evaluate_dir], 'len_different']
-#							f.write('\t'.join(str(w) for w in info) + '\n')
-#						for evaluate_dir in ['ave_pitch', 'ave_intensity', 'ppl', 'num_word', 'word_type']:
-#							info = [lang_dir, '', '', all_wers_results[evaluate_dir], evaluate_dir]
-#							f.write('\t'.join(str(w) for w in info) + '\n')

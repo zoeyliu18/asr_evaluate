@@ -1,0 +1,78 @@
+hupa	top_tier	dates	55.73	17	8.59	31.82
+hupa	top_tier	ave_pitch	54.35
+hupa	top_tier	ave_intensity	53.72
+hupa	top_tier	num_word	52.17
+hupa	top_tier	len	60.12
+hupa	top_tier	distance	55.1	5	0.47	1.28
+hupa	top_tier	word_type	54.43
+hupa	top_tier	ppl	53.55
+hupa	top_tier	random	55.27	17	1.5	5.44
+hupa	second_tier	dates	51.65	34	5.59	25.25
+hupa	second_tier	ave_pitch	52.49
+hupa	second_tier	ave_intensity	53.61
+hupa	second_tier	num_word	50.36
+hupa	second_tier	len	56.2
+hupa	second_tier	distance	51.39	5	0.18	0.47
+hupa	second_tier	word_type	50.76
+hupa	second_tier	ppl	50.26
+hupa	second_tier	random	52.85	34	1.18	4.63
+fongbe	ave_pitch	38.9	38.9
+fongbe	ave_intensity	43.0	43.0
+fongbe	num_word	38.95	38.95
+fongbe	heldout_speaker	32.55	27	12.989333197784902	54.74
+fongbe	random_different	31.994074074074074	27	1.0458388582276519	4.900000000000002
+fongbe	len_different	40.69	40.69
+fongbe	distance	39.742	5	0.1833575741549844	0.4100000000000037
+fongbe	word_type	40.41	40.41
+fongbe	ppl	53.28	53.28
+ave_pitch 38.9
+ave_intensity 43.0
+num_word 38.95
+len_different 40.69
+word_type 40.41
+ppl 53.28
+iban	ave_pitch	14.94	14.94
+iban	ave_intensity	16.47	16.47
+iban	num_word	13.97	13.97
+iban	heldout_speaker	16.91913043478261	23	3.7953595027270755	12.709999999999999
+iban	random_different	14.353478260869565	23	0.5728525805574967	2.1899999999999995
+iban	len_different	15.73	15.73
+iban	distance	13.094	5	0.1439791651594079	0.3600000000000012
+iban	word_type	13.9	13.9
+iban	ppl	27.02	27.02
+ave_pitch 14.94
+ave_intensity 16.47
+num_word 13.97
+len_different 15.73
+word_type 13.9
+ppl 27.02
+wolof	ave_pitch	28.88	28.88
+wolof	ave_intensity	29.87	29.87
+wolof	num_word	28.07	28.07
+wolof	heldout_speaker	28.914444444444445	18	5.985014838275599	19.740000000000002
+wolof	random_different	28.43277777777778	18	0.35691168054914996	1.1999999999999993
+wolof	len_different	31.37	31.37
+wolof	distance	25.652	5	0.08497058314499259	0.19000000000000128
+wolof	word_type	28.85	28.85
+wolof	ppl	42.63	42.63
+ave_pitch 28.88
+ave_intensity 29.87
+num_word 28.07
+len_different 31.37
+word_type 28.85
+ppl 42.63
+swahili	ave_pitch	25.89	25.89
+swahili	ave_intensity	24.98	24.98
+swahili	num_word	25.36	25.36
+swahili	heldout_speaker	26.308888888888887	36	3.463833365983645	17.59
+swahili	random_different	25.83361111111111	36	0.4458645071433235	2.09
+swahili	len_different	26.36	26.36
+swahili	distance	25.624	5	0.2759166540823516	0.5700000000000003
+swahili	word_type	25.37	25.37
+swahili	ppl	45.98	45.98
+ave_pitch 25.89
+ave_intensity 24.98
+num_word 25.36
+len_different 26.36
+word_type 25.37
+ppl 45.98

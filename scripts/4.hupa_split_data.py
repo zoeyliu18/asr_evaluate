@@ -8,7 +8,6 @@ from collections import Counter
 from scipy.stats import wasserstein_distance
 
 import collections
-import random
 from typing import Dict, Generator, Iterator, List, Set, Text, Tuple
 
 import pandas as pd
@@ -36,7 +35,6 @@ def gather_audio_info(file):
 					new_transcript = ' '.join(w for w in new_transcript)
 					new_toks.append(new_transcript)
 					data.append(new_toks)
-
 	else:
 		with io.open(file, encoding = 'utf-8') as f:
 			for line in f:
@@ -70,9 +68,7 @@ def sort(data, num_of_speakers):
 
 	for i in range(len(text_ids)):
 		idx = text_ids[i]
-
-		new_idx = ''
-		
+		new_idx = ''		
 		if len(str(idx)) == 1:
 			new_idx = '000' + str(idx)
 		if len(str(idx)) == 2:
@@ -144,7 +140,18 @@ def write_utt_spk(output, split_id, split, speaker, lang):
 
 ### Random splits ###
 
-def random_split(file, num_of_speakers):
+def random_split(file, num_of_speakers, audio_info_data, output, split_id):
+
+	all_audios = []
+	all_texts = {}
+	all_directories = {}
+
+	for i in range(len(audio_info_data)):
+		audio = audio_info_data[i]
+		audio_time = float(audio[-2])
+		all_audios.append(audio[0])
+		all_directories[audio[0]] = audio[1]
+		all_texts[audio[0]] = audio[-1]
 
 	data = []
 	time_list = []
@@ -180,13 +187,9 @@ def random_split(file, num_of_speakers):
 			if idx in dev_data:
 				print(dev_data[idx])
 			dev_data[idx] = data[index_list[i]][1 : -2]
-#			dev_data.append(' '.join(w for w in data[index_list[i]][ : -2]))
 			start += time_list[index_list[i]]
 			index_list.remove(index_list[i])
 			c += 1
-
-	print(c)
-	print(len(index_list))
 
 	for i in index_list:
 		tok = data[i][0].split('_')
@@ -196,18 +199,31 @@ def random_split(file, num_of_speakers):
 		if idx in train_data:
 			print(train_data[idx])
 		train_data[idx] = data[i][1 : -2]
-		
 
-	print(len(data))
-	print(len(train_data))
-	print(len(dev_data))
-	print('\n')
-	print('\n')
-	print(time / (1000*60*60))
-	print((time - start) / (1000*60*60))
-	print(start / (1000*60*60))
+	new_train_audio = sort(train_data, num_of_speakers)
+	new_dev_audio = sort(dev_data, num_of_speakers)
 
-	return sort(train_data, num_of_speakers), sort(dev_data, num_of_speakers)
+	train_texts = []
+	dev_texts = []
+
+	train_wav = []
+	dev_wav = []
+
+	for i in range(len(new_train_audio)):
+		audio = new_train_audio[i].split()[0]
+		train_texts.append(audio + ' ' + all_texts[audio])
+		train_wav.append(audio + ' ' + all_directories[audio])
+
+	for i in range(len(new_dev_audio)):
+		audio = new_dev_audio[i].split()[0]
+		dev_texts.append(audio + ' ' + all_texts[audio])
+		dev_wav.append(audio + ' ' + all_directories[audio])
+
+	write_text_wav(train_texts, train_wav, dev_texts, dev_wav, split_id, output)
+
+	return new_train_audio, new_dev_audio 
+
+#	return sort(train_data, num_of_speakers), sort(dev_data, num_of_speakers)
 
 
 ### Splitting by threshold of duration ###
@@ -271,6 +287,20 @@ def duration_threshold_different(audio_info_data, output, split_id, num_of_speak
 			audio = k 
 			dev_audio.append(audio)
 
+	train_duration = []
+	dev_duration = []
+
+	for audio in train_audio:
+		train_duration.append(all_durations[audio])
+
+	for audio in dev_audio:
+		dev_duration.append(all_durations[audio])
+
+	train_duration.sort()
+	dev_duration.sort()
+	print(train_duration[-1])
+	print(dev_duration[0])
+
 	train_data = {}
 	dev_data = {}
 
@@ -286,8 +316,6 @@ def duration_threshold_different(audio_info_data, output, split_id, num_of_speak
 			idx = idx[1 : ]
 		dev_data[idx] = all_texts[audio].split()
 
-	print(cutoff)
-	print('\n')
 	print(train_time / (60 * 60))
 	print(dev_time / (60 * 60))
 
@@ -340,7 +368,8 @@ def split_with_wasserstein(audio_info_data, output, split_id, num_of_speakers, l
 	vectorizer = feature_extraction.text.CountVectorizer(dtype=np.int8, min_df=min_df)
 	text_counts = vectorizer.fit_transform(text_data)
 	text_counts = text_counts.todense()
-	nn_tree = neighbors.NearestNeighbors(n_neighbors=int(len(text_data) * HELDOUT_RATE), algorithm='ball_tree', leaf_size=leaf_size, metric=stats.wasserstein_distance)
+	heldout_rate = 0.21
+	nn_tree = neighbors.NearestNeighbors(n_neighbors=int(len(text_data) * heldout_rate), algorithm='ball_tree', leaf_size=leaf_size, metric=stats.wasserstein_distance)
 	nn_tree.fit(text_counts)
 	dev_set_indices = []
 
@@ -362,25 +391,19 @@ def split_with_wasserstein(audio_info_data, output, split_id, num_of_speakers, l
 	for i in range(len(text_data)):
 		index_list.append(i)
 
-	print(time * HELDOUT_RATE)
-
-	while dev_time <= time * HELDOUT_RATE:
+	while dev_time <= time * heldout_rate:
 		for idx in index_list:
 			if idx in dev_set_indices[0]:
 				dev_text = text_data[idx]
 				for k, v in all_texts.items():
 					if v == dev_text:
-						if dev_time <= time * HELDOUT_RATE:
+						if dev_time <= time * heldout_rate:
 							dev_audio.append(k)
 							dev_time += all_durations[k]
-							if dev_time >= time * HELDOUT_RATE:
+							if dev_time >= time * heldout_rate:
 								break
 
-	dev_time = 0
-	for tok in dev_audio:
-		dev_time += all_durations[tok]
-
-	for k, v in all_durations.items():
+	for k, v in all_texts.items():
 		if k not in dev_audio:
 			train_time += all_durations[k]
 			train_audio.append(k)
@@ -465,31 +488,41 @@ def ppl_threshold_different(lm_info_data, output, split_id, num_of_speakers, lan
 	train_audio = []
 	dev_audio = []
 
-	while train_time <= time * (1 - HELDOUT_RATE):
+	i = len(ppl_list) - 1 
+
+	while dev_time <= time * HELDOUT_RATE:
 		for k, v in ppl_dict.items():				
-			if v < cutoff:					
-				train_time += all_durations[k]
-				audio = k 
-				train_audio.append(audio)
-				if train_time >= time * (1 - HELDOUT_RATE):
-					break
+			if v == ppl_list[i]:	
+				audio = k
+				if audio not in dev_audio:	
+					dev_time += all_durations[audio]				 
+					dev_audio.append(audio)
+					if dev_time >= time * HELDOUT_RATE:
+						break
+		i = i - 1
 
-	for k, v in ppl_dict.items():
-		if k not in train_audio:
-			dev_time += all_durations[k]
-			audio = k 
-			dev_audio.append(audio)
-
-	print(cutoff)
-	print('\n')
-
-	train_time = 0
 	for k, v in ppl_dict.items():
 		if k not in dev_audio:
-			train_time += all_durations[k]
+			audio = k 
+			train_time += all_durations[audio]
+			train_audio.append(audio)
 
 	print(train_time / (60 * 60))
 	print(dev_time / (60 * 60))
+
+	train_ppl = []
+	dev_ppl = []
+
+	for audio in train_audio:
+		train_ppl.append(ppl_dict[audio])
+
+	for audio in dev_audio:
+		dev_ppl.append(ppl_dict[audio])
+
+	train_ppl.sort()
+	dev_ppl.sort()
+	print(train_ppl[-1])
+	print(dev_ppl[0])
 
 	train_data = {}
 	dev_data = {}
@@ -569,36 +602,41 @@ def num_word_threshold_different(lm_info_data, output, split_id, num_of_speakers
 	train_audio = []
 	dev_audio = []
 
+	i = len(num_word_list) - 1 
+
 	while dev_time <= time * HELDOUT_RATE:
 		for k, v in num_word_dict.items():				
-			if v >= cutoff:					
-				dev_time += all_durations[k]
-				audio = k 
-				dev_audio.append(audio)
-				if dev_time >= time * HELDOUT_RATE:
-					break
+			if v == num_word_list[i]:		
+				audio = k
+				if audio not in dev_audio:		
+					dev_time += all_durations[audio]				 
+					dev_audio.append(audio)
+					if dev_time >= time * HELDOUT_RATE:
+						break
+		i = i - 1
 
 	for k, v in num_word_dict.items():
 		if k not in dev_audio:
-			train_time += all_durations[k]
 			audio = k 
+			train_time += all_durations[audio]
 			train_audio.append(audio)
-
-	print(cutoff)
-	print('\n')
-
-	train_time = 0
-	for k, v in num_word_dict.items():
-		if k not in dev_audio:
-			train_time += all_durations[k]
-
-	dev_time = 0
-	for k, v in num_word_dict.items():
-		if k in dev_audio:
-			dev_time += all_durations[k]
 
 	print(train_time / (60 * 60))
 	print(dev_time / (60 * 60))
+
+	train_num_word = []
+	dev_num_word = []
+
+	for audio in train_audio:
+		train_num_word.append(num_word_dict[audio])
+
+	for audio in dev_audio:
+		dev_num_word.append(num_word_dict[audio])
+
+	train_num_word.sort()
+	dev_num_word.sort()
+	print(train_num_word[-1])
+	print(dev_num_word[0])
 
 	train_data = {}
 	dev_data = {}
@@ -679,31 +717,40 @@ def word_type_threshold_different(lm_info_data, output, split_id, num_of_speaker
 	train_audio = []
 	dev_audio = []
 
+	i = len(word_types_list) - 1 
 	while dev_time <= time * HELDOUT_RATE:
 		for k, v in word_types_dict.items():				
-			if v >= cutoff:					
-				dev_time += all_durations[k]
-				audio = k 
-				dev_audio.append(audio)
-				if dev_time >= time * HELDOUT_RATE:
-					break
+			if v == word_types_list[i]:		
+				audio = k
+				if audio not in dev_audio:	
+					dev_time += all_durations[audio]				 
+					dev_audio.append(audio)
+					if dev_time >= time * HELDOUT_RATE:
+						break
+		i = i - 1
 
 	for k, v in word_types_dict.items():
 		if k not in dev_audio:
-			train_time += all_durations[k]
 			audio = k 
+			train_time += all_durations[audio]		
 			train_audio.append(audio)
-
-	print(cutoff)
-	print('\n')
-
-	train_time = 0
-	for k, v in word_types_dict.items():
-		if k not in dev_audio:
-			train_time += all_durations[k]
 
 	print(train_time / (60 * 60))
 	print(dev_time / (60 * 60))
+
+	train_word_types = []
+	dev_word_types = []
+
+	for audio in train_audio:
+		train_word_types.append(word_types_dict[audio])
+
+	for audio in dev_audio:
+		dev_word_types.append(word_types_dict[audio])
+
+	train_word_types.sort()
+	dev_word_types.sort()
+	print(train_word_types[-1])
+	print(dev_word_types[0])
 
 	train_data = {}
 	dev_data = {}
@@ -787,14 +834,17 @@ def average_intensity_threshold_different(audio_info_data, output, split_id, num
 	train_audio = []
 	dev_audio = []
 
+	i = len(ave_intensity_list) - 1 
 	while dev_time <= time * HELDOUT_RATE:
-		for k, v in ave_intensity_dict.items():				
-			if v >= cutoff:					
-				dev_time += all_durations[k]
-				audio = k 
-				dev_audio.append(audio)
-				if dev_time >= time * HELDOUT_RATE:
-					break
+		for k, v in ave_intensity_dict.items():
+			if v == ave_intensity_list[i]:
+				audio = k
+				if audio not in dev_audio:
+					dev_time += all_durations[audio]
+					dev_audio.append(audio)
+					if dev_time >= time * HELDOUT_RATE:
+						break
+		i = i - 1
 
 	for k, v in ave_intensity_dict.items():
 		if k not in dev_audio:
@@ -802,16 +852,22 @@ def average_intensity_threshold_different(audio_info_data, output, split_id, num
 			audio = k 
 			train_audio.append(audio)
 
-	print(cutoff)
-	print('\n')
-
-	train_time = 0
-	for k, v in ave_intensity_dict.items():
-		if k not in dev_audio:
-			train_time += all_durations[k]
-
 	print(train_time / (60 * 60))
 	print(dev_time / (60 * 60))
+
+	train_intensity = []
+	dev_intensity = []
+
+	for audio in train_audio:
+		train_intensity.append(ave_intensity_dict[audio])
+
+	for audio in dev_audio:
+		dev_intensity.append(ave_intensity_dict[audio])
+
+	train_intensity.sort()
+	dev_intensity.sort()
+	print(train_intensity[-1])
+	print(dev_intensity[0])
 
 	train_data = {}
 	dev_data = {}
@@ -887,22 +943,24 @@ def average_pitch_threshold_different(audio_info_data, output, split_id, num_of_
 
 	dev_size = int(len(ave_pitch_list) * HELDOUT_RATE)
 
-	cutoff = ave_pitch_list[-1 * dev_size]
-
 	train_time = 0
 	dev_time = 0
 
 	train_audio = []
 	dev_audio = []
 
+	i = len(ave_pitch_list) - 1 
+
 	while dev_time <= time * HELDOUT_RATE:
 		for k, v in ave_pitch_dict.items():				
-			if v >= cutoff:					
-				dev_time += all_durations[k]
-				audio = k 
-				dev_audio.append(audio)
-				if dev_time >= time * HELDOUT_RATE:
-					break
+			if v == ave_pitch_list[i]:	
+				audio = k
+				if audio not in dev_audio:	
+					dev_time += all_durations[audio]				 
+					dev_audio.append(audio)
+					if dev_time >= time * HELDOUT_RATE:
+						break
+		i = i - 1
 
 	for k, v in ave_pitch_dict.items():
 		if k not in dev_audio:
@@ -910,16 +968,29 @@ def average_pitch_threshold_different(audio_info_data, output, split_id, num_of_
 			audio = k 
 			train_audio.append(audio)
 
-	print(cutoff)
-	print('\n')
-
-	train_time = 0
+	dev_audio = []
+	dev_time = 0
 	for k, v in ave_pitch_dict.items():
-		if k not in dev_audio:
-			train_time += all_durations[k]
+		if k not in train_audio:
+			dev_time += all_durations[k]
+			dev_audio.append(k)
 
 	print(train_time / (60 * 60))
 	print(dev_time / (60 * 60))
+
+	train_pitch = []
+	dev_pitch = []
+
+	for audio in train_audio:
+		train_pitch.append(ave_pitch_dict[audio])
+
+	for audio in dev_audio:
+		dev_pitch.append(ave_pitch_dict[audio])
+
+	train_pitch.sort()
+	dev_pitch.sort()
+	print(train_pitch[-1])
+	print(dev_pitch[0])
 
 	train_data = {}
 	dev_data = {}
@@ -975,7 +1046,6 @@ def all_dates(path):
 ### Splits by fieldwork dates ###
 
 def date_split(path, date, num_of_speakers):
-	print(date)
 	if not os.path.exists('data/hupa/' + quality + '/dates/train' + date + '/'):
 		os.makedirs('data/hupa/' + quality + '/dates/train' + date + '/')
 
@@ -1011,7 +1081,6 @@ def date_split(path, date, num_of_speakers):
 							train_data[idx] = toks[1 : -2]
 
 				if 'wav' in file:
-#					print('cp ' + path + folder + '/' + file + ' data/' + quality + '/dates/train' + date + '/')
 					os.system('cp ' + path + folder + '/' + file + ' data/hupa/' + quality + '/dates/train' + date + '/' + args.n + '/')
 
 		if folder.startswith('verdena_') is False and folder.endswith('txt') is False and folder == date and len(folder) == 6:
@@ -1037,21 +1106,25 @@ def date_split(path, date, num_of_speakers):
 	return sort(train_data, num_of_speakers), sort(dev_data, num_of_speakers)
 
 
-
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--input', type = str, help = 'input path')
+	parser.add_argument('--input', type = str, help = 'input path; e.g., data/hupa/top_tier')
 	parser.add_argument('--n', type = str, help = '1 (top tier) or 2(top tier)')
 	parser.add_argument('--split', type = str, help = 'split method')
-	parser.add_argument('--stage', help = 'iterative training as documentation process goes, e.g. 1,2,...15 for top tier data')
 	parser.add_argument('--info', type = str, help = 'path + file of audio_info.txt')
-	parser.add_argument('--speaker', type = str, help = 'different speakers or treating as the same')
 	parser.add_argument('--lang', type = str, help = 'language')
-	
+	parser.add_argument('--speaker', default = 'same', help = 'different speakers or treating as the same')
+
 	args = parser.parse_args()
 
-	audio_info_data = gather_audio_info(args.info)
+	temp_audio_info_data = gather_audio_info(args.info)
+	audio_info_data = []
+	for tok in temp_audio_info_data:
+		file = tok[0]
+		file = file.split('_')
+		if file[1] == args.n:
+			audio_info_data.append(tok)
 
 	quality = ''
 
@@ -1071,7 +1144,9 @@ if __name__ == '__main__':
 		if not os.path.exists('data/hupa/' + quality + '/random/'):
 			os.makedirs('data/hupa/' + quality + '/random/')
 
-		for i in range(1, 11):
+		for i in range(11, 18):
+
+			i = str(i)
 
 			if not os.path.exists('data/hupa/' + quality + '/random/train' + str(i)):
 				os.makedirs('data/hupa/' + quality + '/random/train' + str(i))
@@ -1086,7 +1161,7 @@ if __name__ == '__main__':
 				os.makedirs('data/hupa/' + quality + '/random/dev' + str(i) + '/' + str(args.n) + '/')
 
 
-			train_data, dev_data = random_split(args.input + 'all_text' + args.n + '.txt', args.n)
+			train_data, dev_data = random_split(args.input + 'all_text' + args.n + '.txt', args.n, audio_info_data, args.input + '/random/', str(i))
 
 			train_f = ''
 
@@ -1127,12 +1202,15 @@ if __name__ == '__main__':
 
 			os.system('bash random_sort_data' + str(i) + '.sh')
 
+			write_utt_spk('data/hupa/' + quality + '/' + args.split + '/', i, args.split, args.speaker, args.lang)
+
+
 	if args.split == 'distance':
 
 		if not os.path.exists('data/hupa/' + quality + '/distance/'):
 			os.makedirs('data/hupa/' + quality + '/distance/')
 
-		for i in range(1, 11):
+		for i in range(1, 6):
 
 			i = str(i)
 
@@ -1262,12 +1340,10 @@ if __name__ == '__main__':
 			os.makedirs('data/hupa/' + quality + '/dates/')
 
 		dates = all_dates(args.input)
-		print(dates)
+
 		for date in dates:
 			train_data, dev_data = date_split(args.input, date, args.n)
-
 			train_f = ''
-
 			with io.open('data/hupa/' + quality + '/dates/train' + date + '/text.' + args.n, 'w') as train_f:
 				for tok in train_data:	
 					train_f.write(tok + '\n')
@@ -1275,14 +1351,12 @@ if __name__ == '__main__':
 			os.system('cat data/hupa/' + quality + '/dates/train' + date + '/text.* > data/hupa/' + quality + '/dates/train' + date + '/temp')
 			os.system('mv data/hupa/' + quality + '/dates/train' + date + '/temp data/hupa/' + quality + '/dates/train' + date + '/text')
 
-			corpus = text_to_corpus('data/hupa/' + quality + '/dates/train' + date + '/text.' + args.n)
-		
+			corpus = text_to_corpus('data/hupa/' + quality + '/dates/train' + date + '/text.' + args.n)		
 			with io.open('data/hupa/' + quality + '/dates/train' + date + '/corpus.' + args.n, 'w', encoding = 'utf-8') as f:
 				for tok in corpus:
 					f.write(tok + '\n')
 
 			dev_f = ''
-
 			with io.open('data/hupa/' + quality + '/dates/dev' + date + '/text.' + args.n, 'w') as dev_f:
 				for tok in dev_data:
 					dev_f.write(tok + '\n')
@@ -1290,4 +1364,3 @@ if __name__ == '__main__':
 			os.system('cat data/hupa/' + quality + '/dates/dev' + date + '/text.* > data/hupa/' + quality + '/dates/dev' + date + '/temp')
 			os.system('mv data/hupa/' + quality + '/dates/dev' + date + '/temp data/hupa/' + quality + '/dates/dev' + date + '/text')
 		
-
