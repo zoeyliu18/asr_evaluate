@@ -36,14 +36,28 @@ new_data['Group'] = data['Speaker'].astype('str') + data['File'].astype('str')
 
 lm = smf.mixedlm(formula = 'WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + Num_word_ratio + Word_type_ratio + OOV_ratio', data = new_data, groups = new_data['Speaker'])
 fit = lm.fit()
+print(fit.summary())
 
-
-lm = smf.mixedlm(formula = 'WER ~ Evaluation * (Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + Num_word_ratio + Word_type_ratio + OOV_ratio)', data = new_data, groups = new_data['Speaker'])
-fit = lm.fit()
-
-lm = smf.mixedlm(formula = 'WER ~ Duration_ratio * Evaluation * (Pitch_ratio * Intensity_ratio + PPL_ratio * Num_word_ratio * Word_type_ratio * OOV_ratio)', data = new_data, groups = new_data['Group'])
+## For Hupa and Swahili
+lm = smf.ols(formula = 'WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + Num_word_ratio + Word_type_ratio + OOV_ratio', data = new_data)
 fit = lm.fit()
 print(fit.summary())
+
+#lm = smf.mixedlm(formula = 'WER ~ Evaluation * (Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + Num_word_ratio + Word_type_ratio + OOV_ratio)', data = new_data, groups = new_data['Speaker'])
+#fit = lm.fit()
+
+
+mdata=[]
+fdata=[]
+with open('iban_eval.txt') as f:
+	for line in f:
+		if 'ibm' in line:
+			toks = line.split('\t')
+			mdata.append(float(toks[-2]))
+		if 'ibf' in line:
+			toks = line.split('\t')
+			fdata.append(float(toks[-2]))
+
 #variables = fit.model.exog
 #vif = [variance_inflation_factor(variables, i) for i in range(variables.shape[1] - 1)]
 
@@ -51,7 +65,3 @@ print(fit.summary())
 
 
 #lm.fit_regularized(alpha=2., L1_wt=0,refit=False)
-
-## For Hupa and Swahili
-#lm=smf.ols(formula='WER~ Duration_ratio + Pitch_ratio',data=new_data)
-
