@@ -31,7 +31,7 @@ bash kaldi_scripts/fongbe_random_same_compute_mfcc18.sh
 
 
 train_cmd="run.pl --gpu 1"
-lm_order=$3
+lm_order=$1
 
 
 # monophones

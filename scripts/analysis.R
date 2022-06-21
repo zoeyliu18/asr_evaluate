@@ -2,9 +2,9 @@ library(gridExtra)
 library(ggplot2)
 library(tidyverse)
 library(ggpubr)
-library(lme4)
 library(viridis)
 library(olsrr)
+library(lme4)
 library(car)
 library(MuMIn)
 library(lmerTest)
@@ -79,23 +79,15 @@ fongbe_model <- lm(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_r
 car::vif(fongbe_model)
 
 
-fongbe_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + OOV_ratio || Transcript), data = fongbe, control = lmerControl(check.nobs.vs.nRE = "ignore"))
+fongbe_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (1 | Transcript) + (Duration_ratio || Speaker), data = fongbe, control = lmerControl(check.nobs.vs.nRE = "ignore"))
+summary(fongbe_model)
 
-fongbe_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio || Transcript), data = fongbe, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-fongbe_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio || Transcript), data = fongbe, control = lmerControl(check.nobs.vs.nRE = "ignore")) 
-
-fongbe_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio || Transcript), data = fongbe, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-fongbe_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio  || Transcript), data = fongbe, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-fongbe_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (1  | Transcript), data = fongbe, control = lmerControl(check.nobs.vs.nRE = "ignore"))
 
 saveRDS(fongbe_model, file = 'fongbe_model.rds')
 
 r.squaredGLMM(fongbe_model)
 
-summary(lmerTest :: lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio || Transcript), data = fongbe, control = lmerControl(check.nobs.vs.nRE = "ignore")))
+summary(lmerTest :: lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (1 | Transcript) + (Duratio_ratio || Speaker), data = fongbe, control = lmerControl(check.nobs.vs.nRE = "ignore")))
 
 confint(fongbe_model)
 
@@ -209,29 +201,17 @@ car::vif(wolof_model)
 wolof_model <- lm(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + Num_word_ratio + OOV_ratio, data = wolof)
 car::vif(wolof_model)
 
-wolof_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + Num_word_ratio + Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + Num_word_ratio + Word_type_ratio + OOV_ratio | Transcript), data = wolof)
-
-wolof_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + Word_type_ratio + OOV_ratio || Transcript), data = wolof, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-wolof_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + OOV_ratio || Transcript), data = wolof, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-wolof_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio || Transcript), data = wolof, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-wolof_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio || Transcript), data = wolof, control = lmerControl(check.nobs.vs.nRE = "ignore")) 
-
-wolof_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio || Transcript), data = wolof, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-wolof_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio  || Transcript), data = wolof, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-wolof_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (1  | Transcript), data = wolof, control = lmerControl(check.nobs.vs.nRE = "ignore"))
+wolof_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (1 | Transcript) + (Duration_ratio + Pitch_ratio || Speaker), data = wolof, control = lmerControl(check.nobs.vs.nRE = "ignore"))
+summary(wolof_model)
 
 saveRDS(wolof_model, file = 'wolof_model.rds')
 
+summary(lmerTest :: lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (1 | Transcript) + (Duration_ratio + Pitch_ratio || Speaker), data = wolof, control = lmerControl(check.nobs.vs.nRE = "ignore")))
+
 r.squaredGLMM(wolof_model)
 
-summary(lmerTest :: lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio || Transcript), data = wolof, control = lmerControl(check.nobs.vs.nRE = "ignore")))
-
 confint(wolof_model)
+
 
 ####################################
 ########### Swahili ############
@@ -322,7 +302,7 @@ saveRDS(swahili_model, file = 'swahili_model.rds')
 
 r.squaredGLMM(swahili_model)
 
-summary(lmerTest :: lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio || Transcript), data = swahili, control = lmerControl(check.nobs.vs.nRE = "ignore")))
+summary(lmerTest :: lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio || Transcript), data = swahili, control = lmerControl(check.nobs.vs.nRE = "ignore")))
 
 confint(swahili_model)
 
@@ -394,27 +374,15 @@ car::vif(iban_model)
 iban_model <- lm(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + Num_word_ratio + OOV_ratio, data = iban)
 car::vif(iban_model)
 
-iban_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + Num_word_ratio + Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + Num_word_ratio + Word_type_ratio + OOV_ratio | Transcript), data = iban)
+iban_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (1 | Transcript) + (Duration_ratio + Pitch_ratio + Intensity_ratio || Speaker), data = iban, control = lmerControl(check.nobs.vs.nRE = "ignore"))
+summary(iban_model)
 
-iban_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + Word_type_ratio + OOV_ratio || Transcript), data = iban, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-iban_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio + OOV_ratio || Transcript), data = iban, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-iban_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio || Transcript), data = iban, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-iban_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio || Transcript), data = iban, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-iban_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio || Transcript), data = iban, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-iban_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio  || Transcript), data = iban, control = lmerControl(check.nobs.vs.nRE = "ignore"))
-
-iban_model <- lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (1  | Transcript), data = iban, control = lmerControl(check.nobs.vs.nRE = "ignore"))
 
 saveRDS(iban_model, file = 'iban_model.rds')
 
-r.squaredGLMM(iban_model)
+summary(lmerTest :: lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (1 | Transcript) + (Duration_ratio + Pitch_ratio + Intensity_ratio || Speaker), data = iban, control = lmerControl(check.nobs.vs.nRE = "ignore")))
 
-summary(lmerTest :: lmer(WER ~ Evaluation + Duration_ratio + Pitch_ratio + Intensity_ratio + PPL_ratio +  Word_type_ratio + OOV_ratio + (Duration_ratio + Pitch_ratio + Intensity_ratio || Transcript), data = iban, control = lmerControl(check.nobs.vs.nRE = "ignore")))
+r.squaredGLMM(iban_model)
 
 confint(iban_model)
 
