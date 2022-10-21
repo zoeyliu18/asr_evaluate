@@ -41,7 +41,7 @@ def text_to_corpus(output, split_id):
 	with io.open(output + 'train' + split_id + '/text', encoding = 'utf-8') as f:
 		for line in f:
 			toks = line.strip().split()
-			transcripts = toks[1 : -2]
+			transcripts = toks[1 : ]
 			transcripts = ' '.join(w for w in transcripts)
 			train_corpus.write(transcripts + '\n')
 
@@ -50,7 +50,7 @@ def text_to_corpus(output, split_id):
 	with io.open(output + 'dev' + split_id + '/text', encoding = 'utf-8') as f:
 		for line in f:
 			toks = line.strip().split()
-			transcripts = toks[1 : -2]
+			transcripts = toks[1 : ]
 			transcripts = ' '.join(w for w in transcripts)
 			dev_corpus.write(transcripts + '\n')
 
